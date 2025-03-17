@@ -3,15 +3,38 @@ package main
 
 import (
 	"fmt"
-	utils "plumlabs/back/utils" // Заміни на правильний шлях до лексера
+	"plumlabs/back/utils/lexer"
+	"plumlabs/back/utils/parser"
 )
 
 func main() {
-	input := "![logo](public/images/logo.png)) , [google](https://google.com)"
-	lexer := utils.NewLexer(input)
+	// Тестові дані для лексера
+	input := "This is a **bold bold  bold text!** text, and here is a ![image](url) and a #header"
+	
+	// Створення лексера
+	l := lexer.NewLexer(input)
 
-	for tok := lexer.NextToken(); tok.Type != utils.EOF; tok = lexer.NextToken() {
-		fmt.Printf("Type: %s, Literal: %s\n", tok.Type, tok.Literal)
+	// Створення парсера
+	p := parser.NewParser(l)
+
+	// Запуск парсингу
+	root := p.Parse()
+
+	// Виведення результату
+	printNode(root, 0)
+}
+
+// Функція для рекурсивного виведення дерева нод
+func printNode(node *parser.Node, indent int) {
+	indentation := ""
+	for i := 0; i < indent; i++ {
+		indentation += "  "
+	}
+
+	fmt.Printf("%sNode Type: %s, Value: %s\n", indentation, node.Type, node.Value)
+
+	for _, child := range node.Children {
+		printNode(child, indent+1)
 	}
 }
 
