@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Тестові дані для лексера
-	input := "This is a **bold bold  bold text!** text, and here is a ![image](url) and a #header"
+	input := "This is a **bold bold bold text!** text, and \n here is a ![image](url) and a #header"
 	
 	// Створення лексера
 	l := lexer.NewLexer(input)

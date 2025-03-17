@@ -42,8 +42,14 @@ func (p *Parser) Parse() *Node {
 			root.Children = append(root.Children, p.strikethroughParser())
 		case lexer.AUTO_LINK:
 			root.Children = append(root.Children, p.autoLinkParser())
+		case lexer.NEXT_LINE:
+			root.Children = append(root.Children, p.nlParser())
+		case lexer.TAB:
+			root.Children = append(root.Children, p.tabParser())
 		case lexer.IMAGE:
 			root.Children = append(root.Children, p.imageParser())
+		case lexer.SPACE:
+			root.Children = append(root.Children, p.spaceParser())
 		default:
 			p.NextToken()
 		}
@@ -52,10 +58,31 @@ func (p *Parser) Parse() *Node {
 	return root
 }
 
+func (p *Parser) spaceParser() *Node {
+	node := &Node{Type: SPACE}
+	p.NextToken()
+	return node
+}
+
+
+func (p *Parser) tabParser() *Node {
+	node := &Node{Type: TAB}
+	p.NextToken()
+	return node
+}
+
+
+func (p *Parser) nlParser() *Node {
+	node := &Node{Type: NEXT_LINE}
+	p.NextToken()
+	return node
+}
+
+
 func (p *Parser) textParser() *Node {
 	node := &Node{Type: TEXT, Value: p.curTok.Literal}
 	p.NextToken()
-	for p.curTok.Type == lexer.TEXT {
+	for p.curTok.Type == lexer.TEXT /*|| p.curTok.Type == lexer.SPACE || p.curTok.Type == lexer.TAB */{
 		node.Value += p.curTok.Literal
 		p.NextToken()
 	}
