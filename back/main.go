@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	// Тестові дані для лексера
-	input := "This is a **bold bold bold text!** text, and \n here is a ![image](url) and a #header"
+
+	input := "# ** * text * **\n"
 	
 	// Створення лексера
 	l := lexer.NewLexer(input)
@@ -18,7 +18,7 @@ func main() {
 	p := parser.NewParser(l)
 
 	// Запуск парсингу
-	root := p.Parse()
+	root := p.Parse(lexer.EOF)
 
 	// Виведення результату
 	printNode(root, 0)

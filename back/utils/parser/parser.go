@@ -19,7 +19,74 @@ func (p *Parser) NextToken() {
 	p.curTok = p.lexer.NextToken()
 }
 
-func (p *Parser) Parse() *Node {
+func (p *Parser) Parse(endToken lexer.TokenType) *Node {
+
+	root := &Node{Type: NodeType(endToken)}
+
+	for p.curTok.Type != endToken && p.curTok.Type != lexer.EOF {
+		switch p.curTok.Type {
+			case lexer.TEXT:
+				root.Children = append(root.Children, p.textParser())
+			case lexer.HEADER:
+			    headerNode := &Node{Type: NodeType(lexer.HEADER)}
+			    p.NextToken() 
+			    headerNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			    root.Children = append(root.Children, headerNode)
+			case lexer.LIST_ITEM:
+				listNode := &Node{Type: NodeType(lexer.LIST_ITEM)}
+				p.NextToken()
+				listNode.Children = p.Parse(lexer.NEXT_LINE).Children
+				root.Children = append(root.Children, listNode)
+			case lexer.BLOCK_QUOTE:
+				blockNode := &Node{Type: NodeType(lexer.BLOCK_QUOTE)}
+				p.NextToken()
+				blockNode.Children = p.Parse(lexer.NEXT_LINE).Children
+				root.Children = append(root.Children, blockNode)
+			case lexer.CODE_BLOCK:
+				codeNode := &Node{Type: NodeType(lexer.CODE_BLOCK)}
+				p.NextToken()
+				codeNode.Children = p.Parse(lexer.CODE_BLOCK).Children
+				root.Children = append(root.Children, codeNode)
+			case lexer.BOLD:
+				codeNode := &Node{Type: NodeType(lexer.BOLD)}
+				p.NextToken()
+				codeNode.Children = p.Parse(lexer.BOLD).Children
+				root.Children = append(root.Children, codeNode)
+			case lexer.ITALIC:
+				codeNode := &Node{Type: NodeType(lexer.ITALIC)}
+				p.NextToken()
+				codeNode.Children = p.Parse(lexer.ITALIC).Children
+				root.Children = append(root.Children, codeNode)
+			case lexer.STRIKETHROUGH:
+				codeNode := &Node{Type: NodeType(lexer.STRIKETHROUGH)}
+				p.NextToken()
+				codeNode.Children = p.Parse(lexer.STRIKETHROUGH).Children
+				root.Children = append(root.Children, codeNode)
+			case lexer.AUTO_LINK:
+				linkNode := &Node{Type: NodeType(lexer.AUTO_LINK), Value: p.curTok.Literal}
+				p.NextToken()
+				linkNode.Children = p.Parse(lexer.NEXT_LINE).Children
+				root.Children = append(root.Children, linkNode)
+			case lexer.NEXT_LINE:
+				root.Children = append(root.Children, p.nlParser())
+			case lexer.TAB:
+				root.Children = append(root.Children, p.tabParser())
+			case lexer.IMAGE:
+				imageNode := &Node{Type: NodeType(lexer.IMAGE), Value: p.curTok.Literal}
+				p.NextToken()
+				imageNode.Children = p.Parse(lexer.NEXT_LINE).Children
+				root.Children = append(root.Children, imageNode)
+			case lexer.SPACE:
+				root.Children = append(root.Children, p.spaceParser())
+			default:
+				p.NextToken()
+		}
+	}
+	return root
+
+}
+
+func (p *Parser) Parse3() *Node {
 	root := &Node{Type: "root"}
 
 	for p.curTok.Type != lexer.EOF {
