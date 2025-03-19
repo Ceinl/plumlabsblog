@@ -25,112 +25,71 @@ func (p *Parser) Parse(endToken lexer.TokenType) *Node {
 
 	for p.curTok.Type != endToken && p.curTok.Type != lexer.EOF {
 		switch p.curTok.Type {
-			case lexer.TEXT:
-				root.Children = append(root.Children, p.textParser())
-			case lexer.HEADER:
-			    headerNode := &Node{Type: NodeType(lexer.HEADER)}
-			    p.NextToken() 
-			    headerNode.Children = p.Parse(lexer.NEXT_LINE).Children
-			    root.Children = append(root.Children, headerNode)
-			case lexer.LIST_ITEM:
-				listNode := &Node{Type: NodeType(lexer.LIST_ITEM)}
-				p.NextToken()
-				listNode.Children = p.Parse(lexer.NEXT_LINE).Children
-				root.Children = append(root.Children, listNode)
-			case lexer.BLOCK_QUOTE:
-				blockNode := &Node{Type: NodeType(lexer.BLOCK_QUOTE)}
-				p.NextToken()
-				blockNode.Children = p.Parse(lexer.NEXT_LINE).Children
-				root.Children = append(root.Children, blockNode)
-			case lexer.CODE_BLOCK:
-				codeNode := &Node{Type: NodeType(lexer.CODE_BLOCK)}
-				p.NextToken()
-				codeNode.Children = p.Parse(lexer.CODE_BLOCK).Children
-				root.Children = append(root.Children, codeNode)
-			case lexer.BOLD:
-				codeNode := &Node{Type: NodeType(lexer.BOLD)}
-				p.NextToken()
-				codeNode.Children = p.Parse(lexer.BOLD).Children
-				root.Children = append(root.Children, codeNode)
-			case lexer.ITALIC:
-				codeNode := &Node{Type: NodeType(lexer.ITALIC)}
-				p.NextToken()
-				codeNode.Children = p.Parse(lexer.ITALIC).Children
-				root.Children = append(root.Children, codeNode)
-			case lexer.STRIKETHROUGH:
-				codeNode := &Node{Type: NodeType(lexer.STRIKETHROUGH)}
-				p.NextToken()
-				codeNode.Children = p.Parse(lexer.STRIKETHROUGH).Children
-				root.Children = append(root.Children, codeNode)
-			case lexer.AUTO_LINK:
-				linkNode := &Node{Type: NodeType(lexer.AUTO_LINK), Value: p.curTok.Literal}
-				p.NextToken()
-				linkNode.Children = p.Parse(lexer.NEXT_LINE).Children
-				root.Children = append(root.Children, linkNode)
-			case lexer.NEXT_LINE:
-				root.Children = append(root.Children, p.nlParser())
-			case lexer.TAB:
-				root.Children = append(root.Children, p.tabParser())
-			case lexer.IMAGE:
-				imageNode := &Node{Type: NodeType(lexer.IMAGE), Value: p.curTok.Literal}
-				p.NextToken()
-				imageNode.Children = p.Parse(lexer.NEXT_LINE).Children
-				root.Children = append(root.Children, imageNode)
-			case lexer.SPACE:
-				root.Children = append(root.Children, p.spaceParser())
-			default:
-				p.NextToken()
-		}
-	}
-	return root
-
-}
-
-func (p *Parser) Parse3() *Node {
-	root := &Node{Type: "root"}
-
-	for p.curTok.Type != lexer.EOF {
-		switch p.curTok.Type {
 		case lexer.TEXT:
 			root.Children = append(root.Children, p.textParser())
 		case lexer.HEADER:
-			root.Children = append(root.Children, p.headerParser())
+			headerNode := &Node{Type: NodeType(lexer.HEADER)}
+			p.NextToken()
+			headerNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			root.Children = append(root.Children, headerNode)
 		case lexer.LIST_ITEM:
-			root.Children = append(root.Children, p.listParser())
+			listNode := &Node{Type: NodeType(lexer.LIST_ITEM)}
+			p.NextToken()
+			listNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			root.Children = append(root.Children, listNode)
 		case lexer.BLOCK_QUOTE:
-			root.Children = append(root.Children, p.quoteParser())
+			blockNode := &Node{Type: NodeType(lexer.BLOCK_QUOTE)}
+			p.NextToken()
+			blockNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			root.Children = append(root.Children, blockNode)
 		case lexer.CODE_BLOCK:
-			root.Children = append(root.Children, p.codeParser())
+			codeNode := &Node{Type: NodeType(lexer.CODE_BLOCK)}
+			p.NextToken()
+			codeNode.Children = p.Parse(lexer.CODE_BLOCK).Children
+			root.Children = append(root.Children, codeNode)
 		case lexer.BOLD:
-			root.Children = append(root.Children, p.boldParser())
+			codeNode := &Node{Type: NodeType(lexer.BOLD)}
+			p.NextToken()
+			codeNode.Children = p.Parse(lexer.BOLD).Children
+			root.Children = append(root.Children, codeNode)
 		case lexer.ITALIC:
-			root.Children = append(root.Children, p.italicParser())
+			codeNode := &Node{Type: NodeType(lexer.ITALIC)}
+			p.NextToken()
+			codeNode.Children = p.Parse(lexer.ITALIC).Children
+			root.Children = append(root.Children, codeNode)
 		case lexer.STRIKETHROUGH:
-			root.Children = append(root.Children, p.strikethroughParser())
+			codeNode := &Node{Type: NodeType(lexer.STRIKETHROUGH)}
+			p.NextToken()
+			codeNode.Children = p.Parse(lexer.STRIKETHROUGH).Children
+			root.Children = append(root.Children, codeNode)
 		case lexer.AUTO_LINK:
-			root.Children = append(root.Children, p.autoLinkParser())
+			linkNode := &Node{Type: NodeType(lexer.AUTO_LINK), Value: p.curTok.Literal}
+			p.NextToken()
+			linkNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			root.Children = append(root.Children, linkNode)
 		case lexer.NEXT_LINE:
 			root.Children = append(root.Children, p.nlParser())
 		case lexer.TAB:
 			root.Children = append(root.Children, p.tabParser())
 		case lexer.IMAGE:
-			root.Children = append(root.Children, p.imageParser())
+			imageNode := &Node{Type: NodeType(lexer.IMAGE), Value: p.curTok.Literal}
+			p.NextToken()
+			imageNode.Children = p.Parse(lexer.NEXT_LINE).Children
+			root.Children = append(root.Children, imageNode)
 		case lexer.SPACE:
 			root.Children = append(root.Children, p.spaceParser())
 		default:
 			p.NextToken()
 		}
 	}
-
 	return root
-}
 
+}
 func (p *Parser) spaceParser() *Node {
 	node := &Node{Type: SPACE}
 	p.NextToken()
 	return node
 }
-
 
 func (p *Parser) tabParser() *Node {
 	node := &Node{Type: TAB}
@@ -138,18 +97,16 @@ func (p *Parser) tabParser() *Node {
 	return node
 }
 
-
 func (p *Parser) nlParser() *Node {
 	node := &Node{Type: NEXT_LINE}
 	p.NextToken()
 	return node
 }
 
-
 func (p *Parser) textParser() *Node {
 	node := &Node{Type: TEXT, Value: p.curTok.Literal}
 	p.NextToken()
-	for p.curTok.Type == lexer.TEXT /*|| p.curTok.Type == lexer.SPACE || p.curTok.Type == lexer.TAB */{
+	for p.curTok.Type == lexer.TEXT /*|| p.curTok.Type == lexer.SPACE || p.curTok.Type == lexer.TAB */ {
 		node.Value += p.curTok.Literal
 		p.NextToken()
 	}

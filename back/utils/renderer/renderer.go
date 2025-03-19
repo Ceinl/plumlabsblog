@@ -1,9 +1,7 @@
 package renderer
 
 import (
-	"fmt"
 	"plumlabs/back/utils/parser"
-	"strings"
 )
 
 /*
@@ -39,47 +37,11 @@ const (
 func renderer(node *parser.Node) string{
 
 	switch node.Type {
-	case parser.HEADER:
-		return fmt.Sprintf("<h1> %s </h1",node.Value)
-	case parser.TEXT:
-		return fmt.Sprintf("<p> %s </p>",node.Value)
-	case parser.LIST_ITEM:
-		// Render list item
-	case parser.BLOCK_QUOTE:
-		// Render block quote
-		return fmt.Sprintf("<blockquote> %s </blockquote>", node.Value)
-	case parser.CODE_BLOCK:
-		// Render code block
-	case parser.BOLD:
-		// Render bold text
-		return fmt.Sprintf("<b> %s </b>", node.Value)
-	case parser.ITALIC:
-		// Render italic text
-	case parser.STRIKETHROUGH:
-		// Render strikethrough text
-	case parser.AUTO_LINK:
-		// Render auto link
-	case parser.IMAGE:
-		// Render image
-	case parser.NEXT_LINE:
-		// Render next line
-	case parser.SPACE:
-		// Render space
-	case parser.TAB:
-		// Render tab
-	case parser.EOF:
-		// Render EOF
-	case parser.ILLEGAL:
-		// Render illegal
-	default:
-	return ""
-	}
-	return ""
-}
+	
 
-func render_children(node *parser.Node){
-	var sb strings.Builder
-	for _, child := range node.Children {
-	sb.WriteString(renderer(child))
+
 	}
+
+
+	return ""
 }

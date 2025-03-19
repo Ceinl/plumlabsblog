@@ -3,8 +3,8 @@ package parser
 type NodeType string
 
 const (
-	// Blocks
-	HEADER        NodeType = "HEADER" // +
+
+	HEADER        NodeType = "HEADER" // # h1
 	TEXT          NodeType = "TEXT" // +
 	LIST_ITEM     NodeType = "LIST_ITEM" // +
 	BLOCK_QUOTE   NodeType = "BLOCK_QUOTE" // +

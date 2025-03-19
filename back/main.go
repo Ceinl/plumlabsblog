@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -9,8 +8,7 @@ import (
 
 func main() {
 
-	input := "# ** * text * **\n"
-	
+	input := "# ** * text * ** \n"	
 	// Створення лексера
 	l := lexer.NewLexer(input)
 
