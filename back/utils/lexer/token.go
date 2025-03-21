@@ -14,6 +14,7 @@ const (
 	HEADER        TokenType = "HEADER" //Token "#" or HTML block <h1>  
 	TEXT          TokenType = "TEXT" // Token "..." or HTML block <p> 
 	LIST_ITEM     TokenType = "LIST_ITEM" // Token "*" or HTML block <li> 
+	LIST_BLOCK	  TokenType = "LIST_BLOCK"
 	BLOCK_QUOTE   TokenType = "BLOCK_QUOTE" // Token ">" or HTML block <blockquote>
 	CODE_BLOCK    TokenType = "CODE_BLOCK" // Token "```" or HTML <pre><code>...</code></pre>"
 

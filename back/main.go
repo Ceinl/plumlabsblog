@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	input := "# ** * text * ** \n"	
+	input := "[url](text asd asd)"	
 	// Створення лексера
 	l := lexer.NewLexer(input)
 
