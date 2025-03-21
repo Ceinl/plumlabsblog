@@ -15,10 +15,12 @@ type Renderer struct{
 	root *parser.Node
 }
 
+func NewRender(root *parser.Node) *Renderer {
+	return &Renderer{root: root}
+}
 
 func (r *Renderer)Render(node *parser.Node) string {
-
-	if r.root == nil {
+	if node == nil {
 		return ""
 	}
 
@@ -65,7 +67,7 @@ func (r *Renderer)Render(node *parser.Node) string {
 		 for _, child := range node.Children{
 			html.WriteString(r.Render(child))
 		 }
-		html.WriteString("/<ul>")
+		html.WriteString("</ul>")
 
 	case parser.LIST_ITEM:
 		html.WriteString("<li>")
