@@ -4,6 +4,7 @@ type NodeType string
 
 const (
 
+	DOCUMENT	  NodeType = "DOCUMENT"
 	HEADER        NodeType = "HEADER" //  +
 	TEXT          NodeType = "TEXT" // +
 	LIST_ITEM     NodeType = "LIST_ITEM" // +
