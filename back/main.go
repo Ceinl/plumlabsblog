@@ -7,32 +7,48 @@ import (
 )
 
 func main() {
-
-	input := "[url](text asd asd)"	
-	// Створення лексера
+	input := "-asd\n - ** asd ** \n -asd\n"
+	
+	// Print the original input
+	fmt.Println("Original Input:")
+	fmt.Printf("%q\n\n", input)
+	
+	// Print lexer tokens first
+	fmt.Println("Lexer Results:")
 	l := lexer.NewLexer(input)
-
-	// Створення парсера
+	printTokens(l)
+	
+	// Reset lexer for parser
+	l = lexer.NewLexer(input)
+	
+	// Create parser and run parsing
 	p := parser.NewParser(l)
-
-	// Запуск парсингу
 	root := p.Parse(lexer.EOF)
-
-	// Виведення результату
+	
+	// Print parsing result
+	fmt.Println("\nParser Results:")
 	printNode(root, 0)
 }
 
-// Функція для рекурсивного виведення дерева нод
+// Function to print all tokens from the lexer
+func printTokens(l *lexer.Lexer) {
+	for {
+		tok := l.NextToken()
+		fmt.Printf("Token Type: %s, Literal: %q\n", tok.Type, tok.Literal)
+		if tok.Type == lexer.EOF {
+			break
+		}
+	}
+}
+
+// Function for recursive node tree printing
 func printNode(node *parser.Node, indent int) {
 	indentation := ""
 	for i := 0; i < indent; i++ {
 		indentation += "  "
 	}
-
 	fmt.Printf("%sNode Type: %s, Value: %s\n", indentation, node.Type, node.Value)
-
 	for _, child := range node.Children {
 		printNode(child, indent+1)
 	}
 }
-

@@ -122,16 +122,33 @@ func (p *Parser)parseListBlock() *Node{
 
 	listblock := &Node{Type: LIST_BLOCK}
 	
-	for p.curTok.Type == lexer.LIST_ITEM{
+	for p.curTok.Type == lexer.LIST_ITEM{ 
 
-		p.NextToken()
 		listitem := &Node{Type: LIST_ITEM}
-		listitem.Children = p.Parse(lexer.NEXT_LINE).Children
+		p.NextToken()
+		for p.curTok.Type != lexer.EOF && p.curTok.Type != lexer.NEXT_LINE{
+			if p.curTok.Type == lexer.TEXT {
+				textNode := p.textParser()
+				listitem.Children = append(listitem.Children, textNode)
+			}else {
+				p.NextToken()
+			}
+
+		}
 		listblock.Children = append(listblock.Children, listitem)
 
-		if p.curTok.Type != lexer.LIST_ITEM && p.curTok.Type != lexer.NEXT_LINE{
+		if p.curTok.Type == lexer.NEXT_LINE{ 
+			p.NextToken()	
+		}
+
+		for p.curTok.Type == lexer.SPACE || p.curTok.Type == lexer.TAB{
+			p.NextToken()
+		}
+
+		if p.curTok.Type != lexer.LIST_ITEM{
 			break
 		}
+
 	}
 
 	return listblock
