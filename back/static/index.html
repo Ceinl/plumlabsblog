@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+    <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Upload File</h2>
+        <form id="upload-form" class="flex flex-col space-y-4" hx-post="/upload" hx-encoding="multipart/form-data">
+            <input type="file" name="file" class="file:bg-gray-700 file:text-white file:border-none file:px-4 file:py-2 file:rounded-lg">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">Upload</button>
+        </form>
+        <div id="upload-response" class="mt-4"></div>
+    </div>
+</body>
+</html>

@@ -19,6 +19,7 @@ func (p *Parser) NextToken() {
 	p.curTok = p.lexer.NextToken()
 }
 
+
 func (p *Parser) Parse(endToken lexer.TokenType) *Node {
 
 
