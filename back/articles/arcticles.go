@@ -3,17 +3,15 @@ package articles
 import (
 	"errors"
 	"mime/multipart"
+	"plumlabs/back/storage"
 	"strings"
 )
 
 /*
-	Створити унікальну папку для кожної статті.
-
-	Зберегти md-файл у створеній папці.
-
-	Викликати зовнішній пакет для конвертації md у html.
-
-	Зберегти отриманий html-файл у відповідній папці.
+	створити унікальну папку для кожної статті.
+	зберегти md-файл у створеній папці.
+	викликати зовнішній пакет для конвертації md у html.
+	зберегти отриманий html-файл у відповідній папці.
 */
 
 func HandleFile(files *multipart.FileHeader) error {
@@ -23,15 +21,18 @@ func HandleFile(files *multipart.FileHeader) error {
 		return err
 	}
 
-	if isMarkDown(extention) {
-		// Add to db create folder and a file	
+	if extention == "md" {
+		db, err := storage.Open()
+		
+		if err != nil {
+			return err
+		}
 
-
+		storage.Init(db)
+		storage.InsertTable(db,name)
 	}else{
 		return errors.New("incorrect file extention")
 	}
-
-
 
 	Savefile(name)
 	return nil
@@ -46,12 +47,11 @@ func splitName(file *multipart.FileHeader) (string, string, error) {
 	return splited[0] , splited[1], nil
 }
 
-func isMarkDown(extention string) bool {
-	return extention == "md" 
+func Create(file multipart.File, name string){
+	
 }
 
 func Savefile(name string){
 	// TODO: Create folder with id and create in folder file with name of md file
-
 }
 

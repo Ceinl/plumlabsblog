@@ -18,13 +18,11 @@ func Open() (*sql.DB, error) {
 	
 	return db, nil
 }
-
 func Init(db *sql.DB) error {
 	schema := `
-	CREATE TABLE IF NOT EXISTS tables (
+	CREATE TABLE IF NOT EXISTS Tables (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL,
-		header TEXT DEFAULT '',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);`
 	
@@ -45,7 +43,6 @@ func GetTables(db *sql.DB) ([]string, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var tables []string
 	for rows.Next() {
 		var name string
@@ -54,6 +51,5 @@ func GetTables(db *sql.DB) ([]string, error) {
 		}
 		tables = append(tables, name)
 	}
-
 	return tables, nil
 }
