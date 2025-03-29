@@ -22,23 +22,24 @@ func Init(db *sql.DB) error {
 	schema := `
 	CREATE TABLE IF NOT EXISTS Tables (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
-		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		title TEXT NOT NULL,
+		contentPath TEXT NOT NULL,
+		data DATETIME DEFAULT CURRENT_TIMESTAMP,
 	);`
 	
 	_, err := db.Exec(schema)
 	return err
 } 
 
-func InsertTable(db *sql.DB, name string) error {
-	sqlStmt := ` INSERT INTO tables(name) VALUES (?); `
+func InsertTable(db *sql.DB, title string, contentPath string) error {
+	sqlStmt := ` INSERT INTO tables(title, conentPath) VALUES (?,?) ; `
 	
-	_, err := db.Exec(sqlStmt, name)
+	_, err := db.Exec(sqlStmt, title, contentPath)
 	return err
 }
 
 func GetTables(db *sql.DB) ([]string, error) {
-	rows, err := db.Query("SELECT name FROM tables")
+	rows, err := db.Query("SELECT * FROM tables")
 	if err != nil {
 		return nil, err
 	}
