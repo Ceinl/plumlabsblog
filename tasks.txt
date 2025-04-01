@@ -1,73 +1,115 @@
-# PlumsLabs Blog Platform - Task List
+# PlumsLabs Blog Platform - Development Plan
 
-## Backend Tasks
+## Phase 1: Core Backend Development
 
-1. Complete the article storage functionality:
-   - Create a proper database schema for articles (title, content, date, etc.)  -- To be check
+### 1. Database Implementation
+- Create SQLite database schema for articles 
+- Implement database connection manager
+- Create article repository with CRUD operations
+- Add migration scripts for database setup
 
-2. Implement markdown to HTML conversion pipeline:
-   - Connect the existing lexer, parser, and renderer components
-   - Create a manager to orchestrate the conversion process
-   - Add support for additional markdown features (tables, task lists, etc.)
+### 2. Markdown Processing Pipeline
+- ✓ Connect existing lexer, parser, and renderer components
+- ✓ Create manager to orchestrate conversion process
+- Extend markdown support:
+  - Add table parsing and rendering
+  - Implement task list support (checkboxes)
+  - Add support for footnotes
+  - Implement definition lists
+- **Implement archive upload support**:
+  - Add functionality to extract and process ZIP archives containing Markdown and images
 
-3. Create API endpoints:
-   - GET /articles - List all articles
-   - GET /articles/:id - Get a specific article
-   - POST /upload - Upload a new article (already started)
-   - DELETE /articles/:id - Delete an article
+### 3. API Development
+- Create RESTful endpoints:
+  - GET /articles - List all articles with pagination
+  - GET /articles/:id - Get specific article by ID or slug
+  - POST /upload - Complete file upload and processing
+  - PUT /articles/:id - Update existing article
+  - DELETE /articles/:id - Remove article
+- Implement proper request validation
+- Add response formatting middleware
 
-4. Implement authentication:
-   - Create login/logout functionality for admin users
-   - Secure the upload and delete endpoints
+### 4. Error Handling & Logging
+- Create centralized error handling middleware
+- Implement structured logging with levels
+- Add request/response logging
+- Create custom error types for different scenarios
 
-5. Add error handling and logging:
-   - Implement proper error responses
-   - Add logging for debugging and monitoring
+## Phase 2: Frontend Development
 
-## Frontend Tasks
+### 1. Public Interface
+- Create responsive homepage with article list
+- Implement article detail page with proper markdown rendering
+- Design and implement navigation components
+- Add search functionality
+- Implement pagination for article lists
 
-1. Create the main blog interface:
-   - Homepage with article list
-   - Article detail page
-   - Navigation and layout components
+### 2. Admin Interface
+- Create secure login page
+- Build dashboard for article management
+- Implement article editor with markdown preview
+- Add media upload functionality
+- **Update file upload functionality**:
+  - Modify upload form to accept ZIP archives
 
-2. Implement the admin interface:
-   - Dashboard for managing articles
-   - Improve the existing upload form
-   - Add article editing functionality
+### 3. Design System
+- Define color palette and typography
+- Create reusable UI components
+- Implement responsive grid system
+- Add transitions and animations
+- Ensure accessibility compliance
 
-3. Style the application:
-   - Create a consistent design system
-   - Implement responsive layouts
-   - Add animations and transitions
+## Phase 3: DevOps & Deployment
 
-## DevOps Tasks
+### 1. Docker Configuration
+- Create multi-stage Dockerfile for optimized builds
+- Set up Docker Compose for local development
+- Configure environment variables
+- Optimize for production deployment
 
-1. Complete the Dockerfile:
-   - Set up a proper Docker environment
-   - Configure for production deployment
+### 2. CI/CD Pipeline
+- Set up GitHub Actions workflow
+- Configure automated testing
+- Implement linting and code quality checks
+- Create deployment pipeline to production server
 
-2. Set up CI/CD:
-   - Implement automated testing
-   - Configure deployment pipeline
+## Phase 4: Testing & Quality Assurance
 
-## Testing Tasks
+### 1. Unit Testing
+- Write tests for markdown parser components
+- Test database operations
+- Create API endpoint tests
+- Implement frontend component tests
 
-1. Write unit tests:
-   - Test the markdown parser components
-   - Test the database operations
-   - Test the API endpoints
+### 2. Integration Testing
+- Test complete article creation flow
+- Verify authentication system
+- Test frontend and backend integration
+- Implement end-to-end tests for critical paths
 
-2. Perform integration testing:
-   - Test the complete article creation flow
-   - Test the authentication system
+### 3. Performance Testing
+- Benchmark markdown processing
+- Test database query performance
+- Analyze frontend load times
+- Implement performance monitoring
 
-## Documentation Tasks
+## Phase 5: Documentation
 
-1. Create API documentation:
-   - Document all endpoints
-   - Provide usage examples
+### 1. Technical Documentation
+- Document API endpoints with examples
+- Create database schema documentation
+- Document code architecture
+- Write deployment instructions
 
-2. Write user documentation:
-   - Admin guide for managing content
-   - Markdown syntax guide for content creators
+### 2. User Documentation
+- Create admin user guide
+- Write content creation guidelines
+- Document markdown syntax for authors
+- Provide troubleshooting guide
+
+## Next Steps (Priority Order)
+1. Complete database implementation
+2. Finish API endpoints
+3. Extend markdown support
+4. Implement authentication
+5. Begin frontend development

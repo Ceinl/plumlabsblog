@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 type Renderer struct{
-    root *parser.Node
+    Root *parser.Node
 }
 func NewRender(root *parser.Node) *Renderer {
-    return &Renderer{root: root}
+    return &Renderer{Root: root}
 }
 func (r *Renderer)Render(node *parser.Node) string {
     if node == nil {
