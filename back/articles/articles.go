@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"archive/zip"
 	"errors"
 	"io"
 	"mime/multipart"
@@ -10,134 +11,279 @@ import (
 	"strings"
 )
 
-// HandleFile processes a Markdown file, validates its extension, and creates
-// both .md and .html versions in the storage directory.
-// It returns an error if the file is not a valid Markdown file or if any
-// processing step fails.
-func HandleFile(files *multipart.FileHeader) error {
+// ArticleManager handles article operations including file processing and storage
+type ArticleManager struct {
+	basePath string
+	article  Article
+}
 
-	name, extention, err:= splitName(files)
+// Article represents a blog article with its content in different formats
+type Article struct {
+	Title           string
+	ContentMarkdown string
+	ContentHTML     string
+}
+
+// NewArticleManager creates a new ArticleManager instance with the specified base path.
+func NewArticleManager(basePath string) *ArticleManager {
+	return &ArticleManager{
+		basePath: basePath,
+	}
+}
+
+// Handle processes an uploaded file, validates it, and extracts its contents.
+// It only accepts ZIP files containing markdown and images.
+func (am *ArticleManager) Handle(file *multipart.FileHeader) error {
+    am.article = Article{}
+
+    if !am.isDirExist() {
+        err := os.MkdirAll(am.basePath, 0755)
+        if err != nil {
+            return err
+        }
+    }
+
+    title, extension, err := am.splitFile(file)
+    if err != nil {
+        return err
+    }
+
+    if extension != ".zip" {
+        return errors.New("incorrect file extension: only ZIP files are supported")
+    }
+
+    srcFile, err := file.Open()
+    if err != nil {
+        return err
+    }
+    defer func() {
+        closeErr := srcFile.Close()
+        if closeErr != nil && err == nil {
+            err = closeErr
+        }
+    }()
+
+	tempZipPath := filepath.Join(am.basePath, file.Filename)
+	
+	// Оптимізація: Закриття файлу з перевіркою помилок
+	destFile, err := os.Create(tempZipPath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		closeErr := destFile.Close()
+		if closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}()
+	
+	_, err = io.Copy(destFile, srcFile)
+	if err != nil {
+		destFile.Close()
+		return err
+	}
+	destFile.Close()
+
+	err = am.processZipFile(tempZipPath, title)
+
+	os.Remove(tempZipPath)
+
+	return err
+}
+
+// processZipFile extracts markdown and image files from a ZIP archive
+// and creates the article structure in the file system.
+func (am *ArticleManager) processZipFile(zipPath, zipTitle string) error {
+	reader, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	var mdFile *zip.File
+	var mdFileName string
+
+	for _, file := range reader.File {
+		if strings.HasSuffix(strings.ToLower(file.Name), ".md") {
+			mdFile = file
+			mdFileName = file.Name
+			break
+		}
+	}
+
+	if mdFile == nil {
+		return errors.New("no markdown file found in the ZIP archive")
+	}
+
+	articleTitle := strings.TrimSuffix(filepath.Base(mdFileName), filepath.Ext(mdFileName))
+	am.article.Title = articleTitle
+
+	articleDir := filepath.Join(am.basePath, articleTitle)
+	err = os.MkdirAll(articleDir, 0755)
 	if err != nil {
 		return err
 	}
 
-	if extention != "md"{
-		return errors.New("incorrect file extention")
+	mdContent, err := am.extractFileContent(mdFile)
+	if err != nil {
+		return err
+	}
+	am.article.ContentMarkdown = mdContent
+
+	err = os.WriteFile(filepath.Join(articleDir, "content.md"), []byte(mdContent), 0644)
+	if err != nil {
+		return err
 	}
 
-	if !isDirExist(name) {
-		err = CreateArticle(name, files)
+	html, err := am.convertMarkdownToHTML(mdContent)
+	if err != nil {
+		return err
+	}
+	am.article.ContentHTML = html
 
-		if err != nil{
-			return err
+	err = os.WriteFile(filepath.Join(articleDir, "content.html"), []byte(html), 0644)
+	if err != nil {
+		return err
+	}
+
+	imagesDir := filepath.Join(articleDir, "images")
+	err = os.MkdirAll(imagesDir, 0755)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range reader.File {
+		ext := strings.ToLower(filepath.Ext(file.Name))
+		if am.isImageFile(ext) {
+			err = am.extractFile(file, imagesDir)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
 }
 
-// isDirExist checks if a directory with the given name exists in the articles storage path.
-// It returns true if the directory exists, false otherwise.
-func isDirExist(name string) bool{
-	dirpath := filepath.Join("storage", "articles", name)
-	info, err := os.Stat(dirpath)
-
-	if os.IsNotExist(err){
-		return false 
+func (am *ArticleManager) extractFileContent(file *zip.File) (string, error) {
+	rc, err := file.Open()
+	if err != nil {
+		return "", err
 	}
-	return err == nil && info.IsDir() 
-}
+	defer rc.Close()
 
-// splitName extracts the name and extension from a file.
-// It returns the name, extension, and an error if the filename format is invalid.
-func splitName(file *multipart.FileHeader) (string, string, error) {
-	filename :=	file.Filename
-	splited := strings.Split(filename, ".")
-	if len(splited) != 2{
-		return "", "", errors.New("incorrect file name")	
+	content, err := io.ReadAll(rc)
+	if err != nil {
+		return "", err
 	}
-	return splited[0] , splited[1], nil
+
+	return string(content), nil
 }
 
-// CreateArticle creates a new article directory with content.md and content.html files.
-// It returns an error if any step in the creation process fails.
-func CreateArticle(name string, fh *multipart.FileHeader) error {
-	err := createMd(name,fh)
-	if err != nil{ return err }
+func (am *ArticleManager) extractFile(file *zip.File, destDir string) error {
+	destPath := filepath.Join(destDir, filepath.Base(file.Name))
 
-	err = createHTML(name)
-	if err != nil{ return err }
+	rc, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer rc.Close()
 
-	return nil
+	destFile, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
 
-}
-// ReadArticle retrieves the content of an article file from storage.
-// The extension parameter should include the dot, e.g., ".md" or ".html".
-// It returns the file content as a string and any error encountered.
-func ReadArticle(name, extention string) (string, error) {
-	dirpath := filepath.Join("storage", "articles", name)
-	filepath := filepath.Join(dirpath,name + extention)
-
-	data, err := os.ReadFile(filepath)
-	if err != nil { return "",err }
-	return string(data),nil	
-}
-// UpdateArticle updates an existing article's content.
-// Not implemented yet.
-func UpdateArticle() {
-	// TODO: Implement article update functionality
+	_, err = io.Copy(destFile, rc)
+	return err
 }
 
-// DeleteArticle removes an article from storage.
-// Not implemented yet.
-func DeleteArticle() {
-	// TODO: Implement article deletion functionality
+// convertMarkdownToHTML converts markdown content to HTML using the markdown manager.
+func (am *ArticleManager) convertMarkdownToHTML(markdown string) (string, error) {
+	return manager.ArticleManage(markdown)
 }
 
-// createMd creates a content.md file in the article's directory from the uploaded file.
-// It returns an error if any step in the creation process fails.
-func createMd(name string, fh *multipart.FileHeader) error {
-	dirpath := filepath.Join("storage", "articles", name)
+// isImageFile checks if a file extension corresponds to an image file.
+func (am *ArticleManager) isImageFile(extension string) bool {
+	imageExtensions := map[string]bool{
+		".jpg": true, ".jpeg": true, ".png": true, 
+		".gif": true, ".bmp": true, ".svg": true, ".webp": true,
+	}
+	return imageExtensions[extension]
+}
+
+// CreateArticle initializes a new Article instance with optional title and content.
+func (am *ArticleManager) CreateArticle(title string, content string) error {
+	am.article = Article{
+		Title:           title,
+		ContentMarkdown: content,
+	}
 	
-	err := os.MkdirAll(dirpath, 0755)
-	if err != nil { return err }
-
-	file, err := fh.Open()	
-	if err != nil{ return err }
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-
-	if err != nil{ return err }
-
-	out, err := os.Create(filepath.Join(dirpath, "content" + ".md"))
-	if err != nil { return err }
-	defer out.Close()
-
-	out.Write(data)
-
+	if content != "" {
+		html, err := am.convertMarkdownToHTML(content)
+		if err != nil {
+			return err
+		}
+		am.article.ContentHTML = html
+	}
+	
 	return nil
 }
 
-// createHTML reads the content.md file, converts it to HTML using the markdown manager,
-// and saves the result as content.html in the same directory.
-// It returns an error if any step in the process fails.
-func createHTML(name string) error { 
-
-	dirpath := filepath.Join("storage", "articles", name)
-	filepath := filepath.Join(dirpath,"content.md")
-
-	data, err := os.ReadFile(filepath)
-	if err != nil { return err }
-
-	html, err := manager.ArticleManage(string(data)) 
-	if err != nil { return err }
-
-	out, err := os.Create(dirpath + "/content.html")
-	if err != nil{ return err }
-
-	out.Write([]byte(html))
-
-
-	return nil
+// isDirExist checks if the base directory exists.
+func (am *ArticleManager) isDirExist() bool {
+	info, err := os.Stat(am.basePath)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil && info.IsDir()
 }
+
+// splitFile extracts the name and extension from a file.
+func (am *ArticleManager) splitFile(file *multipart.FileHeader) (string, string, error) {
+	filename := file.Filename
+	splited := strings.Split(filename, ".")
+	if len(splited) < 2 {
+		return "", "", errors.New("incorrect file name")
+	}
+	extension := "." + splited[len(splited)-1]
+	name := strings.TrimSuffix(filename, extension)
+	return name, extension, nil
+}
+
+// UpdateArticle updates an existing article with new content.
+func (am *ArticleManager) UpdateArticle(title string, file *multipart.FileHeader) error {
+
+	articlePath := filepath.Join(am.basePath, title)
+	if !am.articleExists(title) {
+		return errors.New("article does not exist")
+	}
+	
+	err := os.RemoveAll(articlePath)
+	if err != nil {
+		return err
+	}
+	
+	am.article.Title = title
+	return am.Handle(file)
+}
+
+// DeleteArticle removes an article and all its files.
+func (am *ArticleManager) DeleteArticle(title string) error {
+	if !am.articleExists(title) {
+		return errors.New("article does not exist")
+	}
+	
+	return os.RemoveAll(filepath.Join(am.basePath, title))
+}
+
+// articleExists checks if an article with the given title exists.
+func (am *ArticleManager) articleExists(title string) bool {
+	info, err := os.Stat(filepath.Join(am.basePath, title))
+	if os.IsNotExist(err) {
+		return false
+	}
+	return err == nil && info.IsDir()
+}
+
