@@ -55,7 +55,8 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error opening file:", err)
 		return
 	}
-	articles.HandleFile(file)
+	am := articles.NewArticleManager("")
+	am.Handle(file)
 	defer fileHandle.Close()
 
 }
