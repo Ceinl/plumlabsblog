@@ -65,7 +65,7 @@ func (am *ArticleManager) Handle(file *multipart.FileHeader) error {
 
 	tempZipPath := filepath.Join(am.basePath, file.Filename)
 	
-	// Оптимізація: Закриття файлу з перевіркою помилок
+	// Create temporary file for the ZIP archive
 	destFile, err := os.Create(tempZipPath)
 	if err != nil {
 		return err
@@ -79,13 +79,13 @@ func (am *ArticleManager) Handle(file *multipart.FileHeader) error {
 	
 	_, err = io.Copy(destFile, srcFile)
 	if err != nil {
-		destFile.Close()
 		return err
 	}
-	destFile.Close()
 
+	// Process the ZIP file using the original file name (without extension) as the directory name
 	err = am.processZipFile(tempZipPath, title)
 
+	// Clean up the temporary ZIP file
 	os.Remove(tempZipPath)
 
 	return err
@@ -100,9 +100,17 @@ func (am *ArticleManager) processZipFile(zipPath, zipTitle string) error {
 	}
 	defer reader.Close()
 
+	// Create directory with the same name as the ZIP file
+	articleDir := filepath.Join(am.basePath, zipTitle)
+	err = os.MkdirAll(articleDir, 0755)
+	if err != nil {
+		return err
+	}
+
 	var mdFile *zip.File
 	var mdFileName string
 
+	// Find the first markdown file in the archive
 	for _, file := range reader.File {
 		if strings.HasSuffix(strings.ToLower(file.Name), ".md") {
 			mdFile = file
@@ -115,26 +123,24 @@ func (am *ArticleManager) processZipFile(zipPath, zipTitle string) error {
 		return errors.New("no markdown file found in the ZIP archive")
 	}
 
+	// Set article title from the markdown filename
 	articleTitle := strings.TrimSuffix(filepath.Base(mdFileName), filepath.Ext(mdFileName))
 	am.article.Title = articleTitle
 
-	articleDir := filepath.Join(am.basePath, articleTitle)
-	err = os.MkdirAll(articleDir, 0755)
-	if err != nil {
-		return err
-	}
-
+	// Extract markdown content
 	mdContent, err := am.extractFileContent(mdFile)
 	if err != nil {
 		return err
 	}
 	am.article.ContentMarkdown = mdContent
 
+	// Save markdown content
 	err = os.WriteFile(filepath.Join(articleDir, "content.md"), []byte(mdContent), 0644)
 	if err != nil {
 		return err
 	}
 
+	// Convert to HTML and save
 	html, err := am.convertMarkdownToHTML(mdContent)
 	if err != nil {
 		return err
@@ -146,12 +152,14 @@ func (am *ArticleManager) processZipFile(zipPath, zipTitle string) error {
 		return err
 	}
 
+	// Create images directory and extract images
 	imagesDir := filepath.Join(articleDir, "images")
 	err = os.MkdirAll(imagesDir, 0755)
 	if err != nil {
 		return err
 	}
 
+	// Extract all image files
 	for _, file := range reader.File {
 		ext := strings.ToLower(filepath.Ext(file.Name))
 		if am.isImageFile(ext) {
