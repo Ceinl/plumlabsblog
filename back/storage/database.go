@@ -26,9 +26,10 @@ func Open() (*sql.DB, error) {
 func Init(db *sql.DB) error {
 	schema := `
 	CREATE TABLE IF NOT EXISTS Tables (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		title TEXT NOT NULL,
-		contentPath TEXT NOT NULL,
+		id					  INTEGER PRIMARY KEY AUTOINCREMENT,
+		title				  TEXT NOT NULL,
+		contentHTMLpath		  TEXT NOT NULL,
+		contentMarkdownPath   TEXT NOT NULL,
 		data DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
