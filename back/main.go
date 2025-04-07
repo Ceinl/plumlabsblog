@@ -56,7 +56,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	am := articles.NewArticleManager("")
-	am.Handle(file)
+	am.Handle()
 	defer fileHandle.Close()
 
 }
