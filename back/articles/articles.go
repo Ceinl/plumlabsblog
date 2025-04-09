@@ -8,6 +8,9 @@ type Article struct {
 	Title       string
 	mdContent   string
 	htmlContent string
+	Edited		bool
+	Created     string
+	LastUpdate  string
 }
 
 func NewArticleManager(basePath string) *Manager{
