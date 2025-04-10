@@ -3,6 +3,7 @@ package articles
 import (
 	"database/sql"
 	"io"
+	"log"
 	"mime/multipart"
 	"plumlabs/back/utils/manager"
 )
@@ -21,12 +22,14 @@ type Article struct {
 }
 
 func NewArticleManager(db *sql.DB) *Manager{
+	log.Printf("ArticleManager created")
 	return &Manager{
 		db: db,
 	}
 }
 
 func (m Manager) Handle(file *multipart.FileHeader) error {
+	log.Printf("file received: %s",file.Filename)
 	name, extention := splitName(file)
 	if !m.isArticleExist(name) && extention == ".md"{
 		article, err := m.CreateArticle(file)	
@@ -37,6 +40,7 @@ func (m Manager) Handle(file *multipart.FileHeader) error {
 }
 
 func (m Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
+	log.Printf("Creating article from file: %s", file.Filename)
 	var article Article
 
 	article.Title, _ = splitName(file)
@@ -53,6 +57,7 @@ func (m Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 }
 
 func (m Manager) isArticleExist(title string) bool { 
+	log.Printf("Checking if article exist: %s", title)
 	for _,article := range m.Articles{
 		if article.Title == title{
 			return true
@@ -62,6 +67,7 @@ func (m Manager) isArticleExist(title string) bool {
 }
 
 func splitName(file *multipart.FileHeader) (string,string) {
+	log.Printf("Splitting filename: %s", file.Filename)
 	name, extention := "", ""
 	for i := len(file.Filename)-1; i >=0 ; i-- {
 		if string(file.Filename[i]) == "."{
@@ -74,6 +80,7 @@ func splitName(file *multipart.FileHeader) (string,string) {
 }
 
 func (a *Article) GetContent(fileheader *multipart.FileHeader) error {
+	log.Printf("Getting content from file: %s", fileheader.Filename)
 	file, err := fileheader.Open()
 	if err != nil {
 		return err
@@ -90,6 +97,7 @@ func (a *Article) GetContent(fileheader *multipart.FileHeader) error {
 }
 
 func (a *Article) ConvertToHTML() error {
+	log.Printf("Converting to HTML")
 	content, err := manager.ArticleManage(a.MdContent)
 	if err != nil { return err}
 	a.HtmlContent = content
