@@ -3,10 +3,17 @@ package storage
 import (
 	"database/sql"
 	"log"
-	"plumlabs/back/articles"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+type Article struct {
+	Id          int
+	Title       string
+	MdContent   string
+	HtmlContent string
+	Edited		bool
+}
 
 // Function return open database connection
 func Open() (*sql.DB, error) { 
@@ -45,7 +52,8 @@ func Init(db *sql.DB) error {
 // CRUD
 
 // CREATE
-func CreateTable(db *sql.DB, article articles.Article ) (int64, error) {
+func CreateTable(db *sql.DB, article Article ) (int64, error) {
+
 	log.Printf("Creating article with title: %s", article.Title)
 	result, err := db.Exec("INSERT INTO Articles (title, mdContent,htmlContent) VALUES (?, ?, ?)",article.Title,article.MdContent,article.HtmlContent)
 	if err != nil {
@@ -62,18 +70,18 @@ func CreateTable(db *sql.DB, article articles.Article ) (int64, error) {
 
 // READ
 
-func GetArticleById(db *sql.DB, id int) (*articles.Article, error) {
+func GetArticleById(db *sql.DB, id int) (*Article, error) {
 	log.Printf("Getting article with id: %d", id)
-	var article articles.Article
+	var article Article
 
 	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE id = ?", id)
 	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
 
 	return &article,err
 }
-func GetArticleByTitle(db *sql.DB, title string) (*articles.Article, error) {
+func GetArticleByTitle(db *sql.DB, title string) (*Article, error) {
 	log.Printf("Getting article with title: %s", title)
-	var article articles.Article
+	var article Article
 
 	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE title = ?", title)
 	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
@@ -81,15 +89,15 @@ func GetArticleByTitle(db *sql.DB, title string) (*articles.Article, error) {
 	return &article,err
 }
 
-func GetAllArticles(db *sql.DB) ([]articles.Article, error) {
+func GetAllArticles(db *sql.DB) ([]Article, error) {
 	log.Printf("Getting all articles")
-	var _articles []articles.Article
+	var _articles []Article
 
 	rows, err := db.Query("select id, title,mdContent,htmlContent,last_update from Articles")
 	if err != nil { return nil, err }
 
 	for rows.Next() {
-		var article articles.Article
+		var article Article
 		err := rows.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
 		if err != nil { return nil, err }
 		_articles = append(_articles, article)
@@ -100,7 +108,7 @@ func GetAllArticles(db *sql.DB) ([]articles.Article, error) {
 
 // UPDATE
 
-func UpdateAricle(db *sql.DB, a articles.Article) error {
+func UpdateAricle(db *sql.DB, a Article) error {
 	log.Printf("Updating article with id: %d", a.Id)
 	_ , err := db.Exec("UPDATE Articles set title = ?, mdContent = ?, htmlContent = ? WHERE id = ?", a.Title, a.MdContent, a.HtmlContent, a.Id)
 	if err != nil { return err}

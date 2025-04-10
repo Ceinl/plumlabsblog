@@ -7,7 +7,6 @@ import (
 	"mime/multipart"
 	"plumlabs/back/storage"
 	"plumlabs/back/utils/manager"
-	"plumlabs/back/utils/storage"
 )
 
 type Manager struct {
