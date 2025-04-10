@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"io"
 	"mime/multipart"
+	"plumlabs/back/utils/manager"
 	"time"
 )
 
@@ -96,6 +97,9 @@ func (a Article) GetContent(fileheader *multipart.FileHeader) error {
 }
 
 func (a Article) ConvertToHTML() error {
+	content, err := manager.ArticleManage(a.mdContent)
+	a.htmlContent = content
+	if err != nil { return err}
 	return nil
 }
 
