@@ -32,9 +32,7 @@ func (m Manager) Handle(file *multipart.FileHeader) error {
 	name, extention := splitName(file)
 	if !m.isArticleExist(name) && extention == ".md"{
 		article, err := m.CreateArticle(file)	
-		if err != nil {
-			return err
-		}		
+		if err != nil { return err }		
 		m.articles = append(m.articles, article)
 	}
 	return nil
