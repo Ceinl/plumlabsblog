@@ -32,7 +32,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse the multipart form data
-	err := r.ParseMultipartForm(10 << 20) // 10 MB limit
+	err := r.ParseMultipartForm(10 << 20) 
 	if err != nil {
 		http.Error(w, "File too big", http.StatusBadRequest)
 		log.Println("Error parsing form:", err)
@@ -60,8 +60,11 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("error: %s" , err)
 	}
-	am := articles.NewArticleManager(db)
-	am.Handle(file)
+	myArticles := articles.NewArticleManager(db)
+	err = myArticles.Handle(file)
+	if err != nil {
+		log.Fatalf("error: %s", err)
+	}
 	defer fileHandle.Close()
 
 }

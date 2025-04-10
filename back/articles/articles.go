@@ -5,21 +5,19 @@ import (
 	"io"
 	"mime/multipart"
 	"plumlabs/back/utils/manager"
-	"time"
 )
 
 type Manager struct {
 	db        *sql.DB
-	articles  []Article
+	Articles  []Article
 }
 
 type Article struct {
+	Id          int
 	Title       string
-	mdContent   string
-	htmlContent string
+	MdContent   string
+	HtmlContent string
 	Edited		bool
-	Created     string
-	LastUpdate  string
 }
 
 func NewArticleManager(db *sql.DB) *Manager{
@@ -33,7 +31,7 @@ func (m Manager) Handle(file *multipart.FileHeader) error {
 	if !m.isArticleExist(name) && extention == ".md"{
 		article, err := m.CreateArticle(file)	
 		if err != nil { return err }		
-		m.articles = append(m.articles, article)
+		m.Articles = append(m.Articles, article)
 	}
 	return nil
 }
@@ -51,14 +49,11 @@ func (m Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 
 	article.Edited = false
 
-	article.Created = time.Now().Format(time.RFC3339)
-	article.LastUpdate = time.Now().Format(time.RFC3339)
-
 	return article,nil
 }
 
 func (m Manager) isArticleExist(title string) bool { 
-	for _,article := range m.articles{
+	for _,article := range m.Articles{
 		if article.Title == title{
 			return true
 		}
@@ -90,14 +85,14 @@ func (a Article) GetContent(fileheader *multipart.FileHeader) error {
 		return err
 	}
 
-	a.mdContent = string(content)
+	a.MdContent = string(content)
 	return nil 
 }
 
 func (a Article) ConvertToHTML() error {
-	content, err := manager.ArticleManage(a.mdContent)
-	a.htmlContent = content
+	content, err := manager.ArticleManage(a.MdContent)
 	if err != nil { return err}
+	a.HtmlContent = content
 	return nil
 }
 
