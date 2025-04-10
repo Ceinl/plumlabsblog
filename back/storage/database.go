@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"plumlabs/back/articles"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -72,6 +73,22 @@ func GetArticleByTitle(db *sql.DB, title string) (*articles.Article, error) {
 	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
 
 	return &article,err
+}
+
+func GetAllArticles(db *sql.DB) ([]articles.Article, error) {
+	var _articles []articles.Article
+
+	rows, err := db.Query("select id, title,mdContent,htmlContent,last_update from Articles")
+	if err != nil { return nil, err }
+
+	for rows.Next() {
+		var article articles.Article
+		err := rows.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
+		if err != nil { return nil, err }
+		_articles = append(_articles, article)
+	}
+
+	return _articles, nil
 }
 
 // UPDATE

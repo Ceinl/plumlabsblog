@@ -110,7 +110,8 @@ func (r *Renderer)Render(node *parser.Node) string {
 func (r *Renderer)imageRender(value string) string {
     parts := strings.Split(value ," -> ")
     if len(parts) != 2 {
-        return "<img src=\"\" alt=\"Invalid image format\">"
+        //return "<img src=\"\" alt=\"Invalid image format\">"
+		return "<p>Images currently not supported</p>"
     }
     return "<img src=\"" + parts[1] + "\" alt=\"" + parts[0] + "\">"
 }
