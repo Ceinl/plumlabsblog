@@ -37,6 +37,7 @@ func Init(db *sql.DB) error {
 	return err
 }
 
+
 // CRUD
 
 // CREATE
