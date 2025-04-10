@@ -5,7 +5,9 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
+	"plumlabs/back/storage"
 	"plumlabs/back/utils/manager"
+	"plumlabs/back/utils/storage"
 )
 
 type Manager struct {
@@ -28,18 +30,26 @@ func NewArticleManager(db *sql.DB) *Manager{
 	}
 }
 
-func (m Manager) Handle(file *multipart.FileHeader) error {
+func (m *Manager) Handle(file *multipart.FileHeader) error {
 	log.Printf("file received: %s",file.Filename)
 	name, extention := splitName(file)
-	if !m.isArticleExist(name) && extention == ".md"{
-		article, err := m.CreateArticle(file)	
-		if err != nil { return err }		
-		m.Articles = append(m.Articles, article)
+	if !m.isArticleExist(name) {
+		log.Printf("Creating new article")
+		if extention == ".md" {
+			article, err := m.CreateArticle(file)	
+			if err != nil { return err }		
+			m.Articles = append(m.Articles, article)
+		}else{
+			log.Printf("Wrong extention")
+		}
+	}else {
+		log.Printf("Updating old article")
+	
 	}
 	return nil
 }
 
-func (m Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
+func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 	log.Printf("Creating article from file: %s", file.Filename)
 	var article Article
 
@@ -56,7 +66,17 @@ func (m Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 	return article,nil
 }
 
-func (m Manager) isArticleExist(title string) bool { 
+func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) (Article,error){
+	log.Printf("Updating article")
+
+	article , err := storage.GetArticleByTitle(m.db, title) 
+	if err != nil {return article, err}	
+
+	return article,nil
+}
+
+
+func (m *Manager) isArticleExist(title string) bool { 
 	log.Printf("Checking if article exist: %s", title)
 	for _,article := range m.Articles{
 		if article.Title == title{

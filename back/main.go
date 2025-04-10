@@ -52,12 +52,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	// Open the file
 	db, err := storage.Open()
 	if err != nil {
-		log.Fatalf("error: %s" , err)
+		log.Printf("error: %s" , err)
 	}
 	myArticles := articles.NewArticleManager(db)
 	err = myArticles.Handle(file)
 	if err != nil {
-		log.Fatalf("error: %s", err)
+		log.Printf("error: %s", err)
 	}
 
 }
