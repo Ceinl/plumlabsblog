@@ -2,16 +2,15 @@ package article_manager
 
 import (
 	"database/sql"
-	"io"
 	"log"
 	"mime/multipart"
-	"plumlabs/back/utils/manager"
-	"plumlabs/back/articles/Article"
+	Article "plumlabs/back/articles/article"
+	"plumlabs/back/storage"
 )
 
 type Manager struct {
 	db        *sql.DB
-	Articles  []Article
+	Articles  []Article.Article
 }
 
 
@@ -41,9 +40,9 @@ func (m *Manager) Handle(file *multipart.FileHeader) error {
 	return nil
 }
 
-func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
+func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article.Article,error){
 	log.Printf("Creating article from file: %s", file.Filename)
-	var article Article
+	var article Article.Article
 
 	article.Title, _ = splitName(file)
 
@@ -58,11 +57,10 @@ func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 	return article,nil
 }
 
-func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) (Article,error){
+func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) (*Article.Article,error){
 	log.Printf("Updating article")
-	var article Article
-//	article , err := storage.GetArticleByTitle(m.db, title) 
-//	if err != nil {return article, err}	
+	article , err := storage.GetArticleByTitle(m.db, title) 
+	if err != nil {return article, err}	
 
 	return article,nil
 }
@@ -91,29 +89,5 @@ func splitName(file *multipart.FileHeader) (string,string) {
 	return name, extention
 }
 
-func (a *Article) GetContent(fileheader *multipart.FileHeader) error {
-	log.Printf("Getting content from file: %s", fileheader.Filename)
-	file, err := fileheader.Open()
-	if err != nil {
-		return err
-	}
-	defer file.Close() 
-
-	content , err := io.ReadAll(file) 
-	if err != nil {
-		return err
-	}
-
-	a.MdContent = string(content)
-	return nil 
-}
-
-func (a *Article) ConvertToHTML() error {
-	log.Printf("Converting to HTML")
-	content, err := manager.ArticleManage(a.MdContent)
-	if err != nil { return err}
-	a.HtmlContent = content
-	return nil
-}
 
 
