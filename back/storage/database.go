@@ -56,6 +56,23 @@ func CreateTable(db *sql.DB, article articles.Article ) (int64, error) {
 
 // READ
 
+func GetArticleById(db *sql.DB, id int) (*articles.Article, error) {
+	var article articles.Article
+
+	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE id = ?", id)
+	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
+
+	return &article,err
+}
+func GetArticleByTitle(db *sql.DB, title string) (*articles.Article, error) {
+	var article articles.Article
+
+	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE title = ?", title)
+	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
+
+	return &article,err
+}
+
 // UPDATE
 
 func UpdateAricle(db *sql.DB, a articles.Article) error {
