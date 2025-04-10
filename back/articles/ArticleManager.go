@@ -1,12 +1,12 @@
-package articles
+package article_manager
 
 import (
 	"database/sql"
 	"io"
 	"log"
 	"mime/multipart"
-	"plumlabs/back/storage"
 	"plumlabs/back/utils/manager"
+	"plumlabs/back/articles/Article"
 )
 
 type Manager struct {
@@ -14,13 +14,6 @@ type Manager struct {
 	Articles  []Article
 }
 
-type Article struct {
-	Id          int
-	Title       string
-	MdContent   string
-	HtmlContent string
-	Edited		bool
-}
 
 func NewArticleManager(db *sql.DB) *Manager{
 	log.Printf("ArticleManager created")
@@ -67,9 +60,9 @@ func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article,error){
 
 func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) (Article,error){
 	log.Printf("Updating article")
-
-	article , err := storage.GetArticleByTitle(m.db, title) 
-	if err != nil {return article, err}	
+	var article Article
+//	article , err := storage.GetArticleByTitle(m.db, title) 
+//	if err != nil {return article, err}	
 
 	return article,nil
 }
