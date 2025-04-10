@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"plumlabs/back/articles"
+	"plumlabs/back/storage"
 )
 func main() {
 	// Admin route to upload article to server
@@ -55,8 +56,12 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error opening file:", err)
 		return
 	}
-	am := articles.NewArticleManager("")
-	am.Handle()
+	db, err := storage.Open()
+	if err != nil {
+		log.Fatalf("error: %s" , err)
+	}
+	am := articles.NewArticleManager(db)
+	am.Handle(file)
 	defer fileHandle.Close()
 
 }
