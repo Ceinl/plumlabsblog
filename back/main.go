@@ -50,12 +50,6 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	log.Println("Uploading file:", file.Filename)
 
 	// Open the file
-	fileHandle, err := file.Open()
-	if err != nil {
-		http.Error(w, "Error opening file", http.StatusInternalServerError)
-		log.Println("Error opening file:", err)
-		return
-	}
 	db, err := storage.Open()
 	if err != nil {
 		log.Fatalf("error: %s" , err)
@@ -65,6 +59,5 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("error: %s", err)
 	}
-	defer fileHandle.Close()
 
 }

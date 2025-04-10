@@ -73,7 +73,7 @@ func splitName(file *multipart.FileHeader) (string,string) {
 	return name, extention
 }
 
-func (a Article) GetContent(fileheader *multipart.FileHeader) error {
+func (a *Article) GetContent(fileheader *multipart.FileHeader) error {
 	file, err := fileheader.Open()
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (a Article) GetContent(fileheader *multipart.FileHeader) error {
 	return nil 
 }
 
-func (a Article) ConvertToHTML() error {
+func (a *Article) ConvertToHTML() error {
 	content, err := manager.ArticleManage(a.MdContent)
 	if err != nil { return err}
 	a.HtmlContent = content
