@@ -57,12 +57,20 @@ func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article.Article,err
 	return article,nil
 }
 
-func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) (*Article.Article,error){
+func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) error { 
 	log.Printf("Updating article")
-	article , err := storage.GetArticleByTitle(m.db, title) 
-	if err != nil {return article, err}	
+	article, err:= m.CreateArticle(file)
+	if err != nil {return err}
+	storage.UpdateAricle(m.db,article) 
+	return nil
+}
 
-	return article,nil
+func (m *Manager) DeleteArtile(title string) error {
+	log.Printf("Deleting article")
+	
+	
+
+	return nil
 }
 
 
