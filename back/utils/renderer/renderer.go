@@ -111,9 +111,11 @@ func (r *Renderer)imageRender(value string) string {
     parts := strings.Split(value ," -> ")
     if len(parts) != 2 {
         //return "<img src=\"\" alt=\"Invalid image format\">"
-		return "<p>Images currently not supported</p>"
+		return "<p> Images currently not supported:</p>"
     }
-    return "<img src=\"" + parts[1] + "\" alt=\"" + parts[0] + "\">"
+
+	return "<p> Images currently not supported:</p>"
+    //return "<img src=\"" + parts[1] + "\" alt=\"" + parts[0] + "\">"
 }
 func (r *Renderer)linkRenderer(value string) string{
     parts := strings.Split(value ," -> ")
