@@ -41,6 +41,15 @@ func (m *Manager) Handle(file *multipart.FileHeader) error {
 	return nil
 }
 
+/*
+// CRUD 
+//
+// CreateArticle takes file return Article and error
+//
+// OTHER OPERATIONS
+//
+//
+*/
 func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article.Article,error){
 	log.Printf("Creating article from file: %s", file.Filename)
 	var article Article.Article
@@ -53,9 +62,28 @@ func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article.Article,err
 	err = article.ConvertToHTML()
 	if err != nil { return article,err }
 
-	article.Edited = false
-
 	return article,nil
+}
+
+func (m *Manager) ReadHtmlArticle(title string) (content string, err error) {
+	err = nil
+
+	a, err := storage.GetArticleByTitle(m.db,title)
+	if err != nil { return }
+	content = a.HtmlContent
+
+	return 
+}
+
+
+func (m *Manager) ReadMdArticle() (content string,title string, err error) {
+	err = nil
+
+	a, err := storage.GetArticleByTitle(m.db,title)
+	if err != nil { return }
+	content = a.MdContent
+
+	return 
 }
 
 func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) error { 

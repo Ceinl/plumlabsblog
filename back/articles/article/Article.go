@@ -12,7 +12,6 @@ type Article struct {
 	Title       string
 	MdContent   string
 	HtmlContent string
-	Edited		bool
 }
 
 func (a *Article) GetContent(fileheader *multipart.FileHeader) error {
