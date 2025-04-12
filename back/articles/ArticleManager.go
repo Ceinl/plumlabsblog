@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	Article "plumlabs/back/articles/article"
 	"plumlabs/back/storage"
+	"slices"
 )
 
 type Manager struct {
@@ -65,12 +66,14 @@ func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) error 
 	return nil
 }
 
-func (m *Manager) DeleteArtile(title string) error {
+func (m *Manager) DeleteArtile(title string) {
 	log.Printf("Deleting article")
-	
-	
-
-	return nil
+	storage.DeleteArticle(m.db,title)
+	for i,article := range m.Articles{
+		if article.Title == title{
+			m.Articles = slices.Delete(m.Articles, i, i+1)
+		}
+	}
 }
 
 

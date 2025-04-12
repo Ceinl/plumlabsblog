@@ -110,9 +110,9 @@ func UpdateAricle(db *sql.DB, a Article.Article) error {
 }
 
 // DELETE
-func DeleteArticle(db *sql.DB,id int) error{
-	log.Printf("Deleting article with id: %d", id)
-	_ , err := db.Exec("DELETE FROM ARTICLES WHERE id = ?" , id)
+func DeleteArticle(db *sql.DB,title string) error{
+	log.Printf("Deleting article with title: %s", title)
+	_ , err := db.Exec("DELETE FROM ARTICLES WHERE title = ?" , title)
 	if err != nil { return err }
 	return nil
 }

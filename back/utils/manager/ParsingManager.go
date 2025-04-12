@@ -7,13 +7,6 @@ import (
 	"plumlabs/back/utils/renderer"
 )
 
-/*
-//		Parsing manager, take a md file send to renderer, take renderee output send to saveing system of HTML file
-//
-//		Next step: Add db integration
-*/
-
-
 func ArticleManage(content string) (string, error) {
 	
 	if content == "" {
