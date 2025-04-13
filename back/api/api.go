@@ -3,14 +3,16 @@ package api
 /*
 
 	Admin
-		Create Article
-		Update Article
-		Delete Article
+		Create Article POST
+		Update Article POST
+		Delete Article POST
 
     User
-		Get All articles
-		Get Specific article
+		Get All articles GET
+		Get Specific article GET
 
 */
+
+
 
 
