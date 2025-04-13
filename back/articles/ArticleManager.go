@@ -86,6 +86,20 @@ func (m *Manager) ReadMdArticle() (content string,title string, err error) {
 	return 
 }
 
+func (m *Manager) ReadAllArticleTitles() (titles []string, err error) {
+	err = nil
+
+	articles, err := storage.GetAllArticles(m.db)
+
+	for _ , article := range articles{
+		titles = append(titles, article.Title)
+	}
+
+	if err != nil { return }
+
+	return
+}
+
 func (m *Manager) UpdateArticle(title string, file *multipart.FileHeader) error { 
 	log.Printf("Updating article")
 	article, err:= m.CreateArticle(file)
