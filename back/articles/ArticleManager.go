@@ -121,12 +121,8 @@ func (m *Manager) DeleteArtile(title string) {
 
 func (m *Manager) isArticleExist(title string) bool { 
 	log.Printf("Checking if article exist: %s", title)
-	for _,article := range m.Articles{
-		if article.Title == title{
-			return true
-		}
-	}
-	return false
+	_, err := storage.GetArticleByTitle(m.db,title)
+	return err == nil
 }
 
 func splitName(file *multipart.FileHeader) (string,string) {

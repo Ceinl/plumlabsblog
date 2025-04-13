@@ -9,26 +9,14 @@ The current system is a markdown-to-HTML article management system with:
 
 ## Improvement Areas
 
-### 1. Database Integration
-- Fix the `GetAllArticles` function to properly scan all fields
-- Implement proper error handling in database operations
-- Add transaction support for database operations
-- Create database migration scripts for schema changes
-- Add indexes for performance optimization
+### 1. Database Integration ++??
 
-### 2. Article Management
-- Fix the `GetContent` and `ConvertToHTML` methods to properly update the article struct (currently they don't modify the receiver)
-- Implement article update functionality
-- Add article deletion capability
-- Implement article search functionality
-- Add article categorization/tagging
+### 2. Article Management +++
 
 ### 3. API Endpoints
 - Create RESTful API endpoints for article CRUD operations
 - Implement proper request validation
 - Add pagination for article listing
-- Implement sorting and filtering options
-- Add API documentation (Swagger/OpenAPI)
 
 ### 4. Authentication & Authorization
 - Implement user authentication system
