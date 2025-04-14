@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	"plumlabs/back/articles"
+
+	article_manager "plumlabs/back/articles"
 	"plumlabs/back/storage"
 )
 func main() {
@@ -54,7 +55,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error: %s" , err)
 	}
-	myArticles := articles.NewArticleManager(db)
+	myArticles := article_manager.NewArticleManager(db)
 	err = myArticles.Handle(file)
 	if err != nil {
 		log.Printf("error: %s", err)
