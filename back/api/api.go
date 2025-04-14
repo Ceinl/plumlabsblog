@@ -2,9 +2,9 @@ package api
 
 import (
 	"database/sql"
-//	"mime/multipart"
+	//	"mime/multipart"
 	"net/http"
-	"plumlabs/back/articles"
+	article_manager "plumlabs/back/articles"
 )
 
 type API struct {
@@ -12,13 +12,13 @@ type API struct {
 	am		  article_manager.Manager	
 }
 
-func New(db *sql.DB) *API {
+func New(db *sql.DB) API {
 	api := API{ db: db }
 
 	am := *article_manager.NewArticleManager(db)
 	api.am = am
 
-	return &api
+	return api
 }
 
 func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {}
