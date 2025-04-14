@@ -2,7 +2,8 @@ package api
 
 import (
 	"database/sql"
-	"mime/multipart"
+//	"mime/multipart"
+	"net/http"
 	"plumlabs/back/articles"
 )
 
@@ -20,19 +21,10 @@ func New(db *sql.DB) *API {
 	return &api
 }
 
-func (api *API) ApiPostFile(file *multipart.FileHeader) error {
-	return nil
-}
+func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {}
 
-func (api *API) ApiDeleteArticle(title string) error {
-	return nil
-}
+func (api *API) ApiDeleteArticle(w http.ResponseWriter, r *http.Request) { }
 
-func (api *API) ApiGetArticle(title string) string {
-	return ""
-}
+func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) { }
 
-func (api *API) ApiGetTitles() string{
-	return ""
-
-}
+func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) { }
