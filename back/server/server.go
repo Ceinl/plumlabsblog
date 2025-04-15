@@ -16,7 +16,11 @@ import (
 type Server struct{
 	api api.API
 	mux *http.ServeMux
-	port string
+	env Env 
+}
+
+type Env struct {
+	Port string
 }
 
 func NewServer(api api.API) *Server {
@@ -24,21 +28,25 @@ func NewServer(api api.API) *Server {
 	s := Server{
     	api: api, 
     	mux: http.NewServeMux(),
-    	port: loadPort(),
+		env: *newEnv(),
 	}
 	
 
 	return &s
 }
 
+func newEnv() *Env {
+	return &Env{ Port: loadPort() }
+}
+
 func (s *Server) StartWithGracefulShutdown() {
 	srv := &http.Server{
-		Addr:    ":" + s.port,
+		Addr:    ":" + s.env.Port,
 		Handler: s.mux,
 	}
 
 	go func() {
-		log.Printf("Server listening on port %s\n", s.port)
+		log.Printf("Server listening on port %s\n", s.env.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}

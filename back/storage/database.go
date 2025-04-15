@@ -35,7 +35,7 @@ func Init(db *sql.DB) error {
     	htmlContent 		  TEXT NOT NULL,
     	mdContent			  TEXT NOT NULL,
     	created_at            DATETIME DEFAULT CURRENT_TIMESTAMP,
-    	last_update           DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    	last_update           DATETIME DEFAULT CURRENT_TIMESTAMP 
 	);
 	`
 	_, err := db.Exec(schema)
@@ -103,7 +103,7 @@ func GetAllArticles(db *sql.DB) ([]Article.Article, error) {
 
 func UpdateAricle(db *sql.DB, a Article.Article) error {
 	log.Printf("Updating article with id: %d", a.Id)
-	_ , err := db.Exec("UPDATE Articles set title = ?, mdContent = ?, htmlContent = ? WHERE id = ?", a.Title, a.MdContent, a.HtmlContent, a.Id)
+	_ , err := db.Exec("UPDATE Articles set title = ?, mdContent = ?, htmlContent = ?, last_update = CURRENT_TIMESTAMP WHERE id = ?", a.Title, a.MdContent, a.HtmlContent, a.Id)
 	if err != nil { return err}
 
 	return nil
