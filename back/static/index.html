@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
-    <div class="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
-        <h2 class="text-xl font-bold mb-4">Upload File</h2>
-        <form id="upload-form" class="flex flex-col space-y-4" hx-post="/upload" hx-encoding="multipart/form-data">
-            <input type="file" name="file" class="file:bg-gray-700 file:text-white file:border-none file:px-4 file:py-2 file:rounded-lg">
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">Upload</button>
-        </form>
-        <div id="upload-response" class="mt-4"></div>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-2xl p-6 bg-gray-800 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">API Admin Panel</h2>
+
+
+    <div class="flex space-x-2 mb-4">
+      <button class="tab-btn bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg" data-tab="post">POST</button>
+      <button class="tab-btn bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg" data-tab="delete">DELETE</button>
+      <button class="tab-btn bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg" data-tab="get">GET</button>
+      <button class="tab-btn bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg" data-tab="getall">GET ALL</button>
     </div>
+
+    <div id="post" class="tab active">
+      <form hx-post="/api/upload" hx-encoding="multipart/form-data" class="flex flex-col space-y-4">
+        <input type="file" name="file" class="file:bg-gray-700 file:text-white file:border-none file:px-4 file:py-2 file:rounded-lg">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">Upload</button>
+      </form>
+    </div>
+
+    <div id="delete" class="tab hidden">
+      <form hx-post="/api/article/delete" class="flex flex-col space-y-4">
+        <input type="text" name="target" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
+        <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Delete</button>
+      </form>
+    </div>
+
+    <div id="get" class="tab hidden">
+      <form hx-get="/api/article/get" class="flex flex-col space-y-4">
+        <input type="text" name="query" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg">Get</button>
+      </form>
+    </div>
+
+    <div id="getall" class="tab hidden">
+      <form hx-get="/api/articles/getall" class="flex flex-col space-y-4">
+        <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">Get All</button>
+      </form>
+    </div>
+
+    <div id="upload-response" class="mt-4"></div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab');
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('bg-blue-600'));
+        btn.classList.add('bg-blue-600');
+        contents.forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(btn.dataset.tab).classList.remove('hidden');
+      });
+    });
+  </script>
 </body>
 </html>

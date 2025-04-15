@@ -70,8 +70,8 @@ func (s *Server) StartWithGracefulShutdown() {
 func (s *Server) SetupRoutes(){
 	s.mux.HandleFunc("/api/upload", s.api.ApiPostFile)
 	s.mux.HandleFunc("/api/article/delete", s.api.ApiDeleteArticle)
-	s.mux.HandleFunc("/api/article", s.api.ApiGetArticle)
-	s.mux.HandleFunc("/api/articles", s.api.ApiGetTitles)
+	s.mux.HandleFunc("/api/article/get", s.api.ApiGetArticle)
+	s.mux.HandleFunc("/api/article/getall", s.api.ApiGetTitles)
 
 	fs := http.FileServer(http.Dir("./static"))
 	s.mux.Handle("/", fs)
