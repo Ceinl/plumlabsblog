@@ -36,8 +36,25 @@ func (m *Manager) Handle(file *multipart.FileHeader) error {
 		}
 	}else {
 		log.Printf("Updating old article")
-	
+		m.UpdateArticle(name,file)
 	}
+
+	m.SaveArticles()
+
+	return nil
+}
+
+func (m *Manager) SaveArticles() error {
+	log.Printf("Saving articles ")
+
+	for _, article := range m.Articles {
+		_,err := storage.CreateTable(m.db, article)
+		if err != nil {
+			return err
+		}
+	}
+
+
 	return nil
 }
 
@@ -60,7 +77,10 @@ func (m *Manager) CreateArticle(file *multipart.FileHeader) (Article.Article,err
 	if err != nil { return article,err }
 
 	err = article.ConvertToHTML()
-	if err != nil { return article,err }
+	if err != nil { 
+		log.Printf("smth2")
+		return article,err
+	}
 
 	return article,nil
 }

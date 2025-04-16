@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 	article_manager "plumlabs/back/articles"
 )
@@ -38,6 +39,7 @@ func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf(handler.Filename)
 	err = api.articleManager.Handle(handler)
 	if err != nil {
 		http.Error(w, "<div class='error'>Failed to process article: "+err.Error()+"</div>", http.StatusInternalServerError)
