@@ -83,9 +83,16 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
 	titles, err := api.articleManager.ReadAllArticleTitles()
 	if err != nil {
-		http.Error(w, "Failed to get titles", http.StatusInternalServerError)
+		log.Printf("Error getting titles: %v", err)
+		http.Error(w, "<div class='error'>Failed to get titles: "+err.Error()+"</div>", http.StatusInternalServerError)
 		return
 	}
+	
+	// Check if titles is nil or empty
+	if titles == nil {
+		titles = []string{} // Initialize with empty slice to avoid nil pointer
+	}
+	
 	w.Header().Set("Content-Type", "text/html")
 	html := "<ul>"
 	for _, title := range titles {
