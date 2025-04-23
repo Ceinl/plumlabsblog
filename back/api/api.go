@@ -22,6 +22,11 @@ func New(db *sql.DB) API {
 }
 
 func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "HX-Request, HX-Target, HX-Current-URL, Content-Type")
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "<div class='error'>Method not allowed</div>", http.StatusMethodNotAllowed)
 		return
@@ -48,26 +53,57 @@ func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
+	log.Printf("Article uploaded successfully")	
 	w.Write([]byte("<div id='upload-result' class='success'>Article uploaded successfully</div>"))
 }
 
 func (api *API) ApiDeleteArticle(w http.ResponseWriter, r *http.Request) {
-    title := r.URL.Query().Get("title")
-    if title == "" {
-        http.Error(w, "<div class='error'>Missing title parameter</div>", http.StatusBadRequest)
-        return
-    }
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "HX-Request, HX-Target, HX-Current-URL, Content-Type")
 
-    api.articleManager.DeleteArtile(title)
+	if r.Method == http.MethodOptions {
+		log.Printf("OPTIONS request received")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
-    w.Header().Set("Content-Type", "text/html")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("<div id='delete-result' class='success'>Article '" + title + "' deleted successfully</div>"))
+	if r.Method != http.MethodPost {
+		log.Printf("Method not allowed")
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form", http.StatusBadRequest)
+		return
+	}
+
+	title := r.FormValue("title")
+	if title == "" {
+		http.Error(w, "<div class='error'>Missing title parameter</div>", http.StatusBadRequest)
+		return
+	}
+
+	api.articleManager.DeleteArtile(title)
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("<div id='delete-result' class='success'>Article '" + title + "' deleted successfully</div>"))
 }
 
 func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "HX-Request, HX-Target, HX-Current-URL, Content-Type")
+
 	title := r.URL.Query().Get("title")
-	if title == "" {
+
+	// LOGING TO DEBUG REMOVE AFTER
+	log.Printf(title)
+
+	if title == ""{
 		http.Error(w, "Missing title parameter", http.StatusBadRequest)
 		return
 	}
@@ -81,6 +117,11 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "HX-Request, HX-Target, HX-Current-URL, Content-Type")
+
 	titles, err := api.articleManager.ReadAllArticleTitles()
 	if err != nil {
 		log.Printf("Error getting titles: %v", err)

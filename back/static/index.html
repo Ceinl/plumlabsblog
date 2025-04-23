@@ -28,20 +28,20 @@
 
     <div id="delete" class="tab hidden">
       <form hx-post="/api/article/delete" class="flex flex-col space-y-4">
-        <input type="text" name="target" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
+        <input type="text" name="title" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
         <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Delete</button>
       </form>
     </div>
 
     <div id="get" class="tab hidden">
       <form hx-get="/api/article/get" class="flex flex-col space-y-4">
-        <input type="text" name="query" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
+        <input type="text" name="title" placeholder="Title ..." class="px-4 py-2 rounded bg-gray-700 text-white">
         <button type="submit" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg">Get</button>
       </form>
     </div>
 
     <div id="getall" class="tab hidden">
-      <form hx-get="/api/articles/getall" class="flex flex-col space-y-4">
+      <form hx-get="/api/articles/getall" hx-swap="afterend" class="flex flex-col space-y-4">
         <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">Get All</button>
       </form>
     </div>

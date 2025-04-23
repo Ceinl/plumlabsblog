@@ -93,6 +93,8 @@ func (r *Renderer)Render(node *parser.Node) string {
         html.WriteString(r.imageRender(node.Value))
     case parser.AUTO_LINK:
         html.WriteString(r.linkRenderer(node.Value))
+	case parser.NEXT_LINE:
+		html.WriteString("<br>")
 
     default:
         if len(node.Children) > 0 {
@@ -102,7 +104,9 @@ func (r *Renderer)Render(node *parser.Node) string {
         } else if node.Value != "" {
             html.WriteString(node.Value)
         } else {
-            html.WriteString("<p>Error</p>")
+			
+			a := node.Value
+            html.WriteString("<p>"+ a + "</p>")
         }
     } 
     return html.String() 

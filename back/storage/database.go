@@ -10,7 +10,7 @@ import (
 )
 
 // Function return open database connection
-func Open() (*sql.DB, error) { 
+func Open() (*sql.DB, error) {
 	log.Printf("Openning database connection")
 
 	db, err := sql.Open("sqlite3", "storage.db")
@@ -42,14 +42,13 @@ func Init(db *sql.DB) error {
 	return err
 }
 
-
 // CRUD
 
 // CREATE
 func CreateTable(db *sql.DB, article Article.Article) (int64, error) {
 
 	log.Printf("Creating article with title: %s", article.Title)
-	result, err := db.Exec("INSERT INTO Articles (title, mdContent,htmlContent) VALUES (?, ?, ?)",article.Title,article.MdContent,article.HtmlContent)
+	result, err := db.Exec("INSERT INTO Articles (title, mdContent,htmlContent) VALUES (?, ?, ?)", article.Title, article.MdContent, article.HtmlContent)
 	if err != nil {
 		return 0, err
 	}
@@ -64,22 +63,22 @@ func CreateTable(db *sql.DB, article Article.Article) (int64, error) {
 
 // READ
 
-func GetArticleById(db *sql.DB, id int) (*Article.Article , error) {
+func GetArticleById(db *sql.DB, id int) (*Article.Article, error) {
 	log.Printf("Getting article with id: %d", id)
-	var article Article.Article 
+	var article Article.Article
 	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE id = ?", id)
-	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
+	err := row.Scan(&article.Id, &article.Title, &article.MdContent, &article.HtmlContent)
 
-	return &article,err
+	return &article, err
 }
 func GetArticleByTitle(db *sql.DB, title string) (*Article.Article, error) {
 	log.Printf("Getting article with title: %s", title)
-	var article Article.Article 
+	var article Article.Article
 
 	row := db.QueryRow("select id, title,mdContent,htmlContent,last_update from Articles WHERE title = ?", title)
-	err := row.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
+	err := row.Scan(&article.Id, &article.Title, &article.MdContent, &article.HtmlContent, &article.LastUpdate)
 
-	return &article,err
+	return &article, err
 }
 
 func GetAllArticles(db *sql.DB) ([]Article.Article, error) {
@@ -87,13 +86,24 @@ func GetAllArticles(db *sql.DB) ([]Article.Article, error) {
 	var _articles []Article.Article
 
 	rows, err := db.Query("select id, title,mdContent,htmlContent,last_update from Articles")
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
 	for rows.Next() {
-		var article Article.Article 
-		err := rows.Scan(&article.Id,&article.Title, &article.MdContent, &article.HtmlContent)
-		if err != nil { return nil, err }
+		var article Article.Article
+		err := rows.Scan(&article.Id, &article.Title, &article.MdContent, &article.HtmlContent, &article.LastUpdate)
+		if err != nil {
+			log.Printf("Error scanning article row: %v", err)
+			return nil, err
+		}
 		_articles = append(_articles, article)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("Error iterating article rows: %v", err)
+		return nil, err
 	}
 
 	return _articles, nil
@@ -103,17 +113,20 @@ func GetAllArticles(db *sql.DB) ([]Article.Article, error) {
 
 func UpdateAricle(db *sql.DB, a Article.Article) error {
 	log.Printf("Updating article with id: %d", a.Id)
-	_ , err := db.Exec("UPDATE Articles set title = ?, mdContent = ?, htmlContent = ?, last_update = CURRENT_TIMESTAMP WHERE id = ?", a.Title, a.MdContent, a.HtmlContent, a.Id)
-	if err != nil { return err}
+	_, err := db.Exec("UPDATE Articles set title = ?, mdContent = ?, htmlContent = ?, last_update = CURRENT_TIMESTAMP WHERE id = ?", a.Title, a.MdContent, a.HtmlContent, a.Id)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 // DELETE
-func DeleteArticle(db *sql.DB,title string) error{
+func DeleteArticle(db *sql.DB, title string) error {
 	log.Printf("Deleting article with title: %s", title)
-	_ , err := db.Exec("DELETE FROM ARTICLES WHERE title = ?" , title)
-	if err != nil { return err }
+	_, err := db.Exec("DELETE FROM ARTICLES WHERE title = ?", title)
+	if err != nil {
+		return err
+	}
 	return nil
 }
-
