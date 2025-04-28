@@ -100,9 +100,6 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 
 	title := r.URL.Query().Get("title")
 
-	// LOGING TO DEBUG REMOVE AFTER
-	log.Printf(title)
-
 	if title == ""{
 		http.Error(w, "Missing title parameter", http.StatusBadRequest)
 		return
@@ -113,6 +110,8 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html")
+
+	// TODO: return not html content but tamplate with html as param
 	w.Write([]byte(html))
 }
 
@@ -129,12 +128,13 @@ func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// Check if titles is nil or empty
 	if titles == nil {
-		titles = []string{} // Initialize with empty slice to avoid nil pointer
+		titles = []string{} 
 	}
 	
 	w.Header().Set("Content-Type", "text/html")
+	
+	// TODO: return not html content but tamplate with titles as param
 	html := "<ul>"
 	for _, title := range titles {
 		html += "<li>" + title + "</li>"

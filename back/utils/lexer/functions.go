@@ -8,7 +8,7 @@ func (l *Lexer) newToken(tokenType TokenType, ch byte) Token {
 // Lexer funcs
 func (l *Lexer) readText() string {
 	possition := l.position 
-	for isLetter(l.ch) || isDigit(l.ch) {
+	for isLetter(l.ch) || isDigit(l.ch) || isSymbol(l.ch) {
 		l.readChar()
 	}
 	return l.input[possition:l.position]
@@ -80,5 +80,10 @@ func isLetter(ch byte)bool {
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
+
+func isSymbol(ch byte) bool {
+	return ch == '!' || ch == '?' || ch == ',' || ch == '.' || ch == ':' || ch == ';' 
+}
+
 // -------
 
