@@ -155,7 +155,7 @@ func AllArticlesWrapper(titles []string) []byte {
 			htmlBuilder.WriteString(fmt.Sprintf(
 				`<li
                     class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out text-center'
-                    hx-get="/api/article/get?title=%s"
+					hx-get="http://localhost:1612/api/article/get?title=%s"
                     hx-target="#article-display"
                     hx-swap="innerHTML"
                     hx-indicator="#loading-indicator">

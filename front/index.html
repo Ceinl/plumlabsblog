@@ -11,8 +11,37 @@
         tailwind.config = {
             darkMode: 'class', // or 'media'
             theme: {
-                extend: {}
-            }
+                extend: {
+                    typography: ({ theme }) => ({
+                        DEFAULT: {
+                            css: {
+                                color: theme('colors.gray.700'),
+                                a: {
+                                    color: theme('colors.blue.500'),
+                                    '&:hover': {
+                                        color: theme('colors.blue.700'),
+                                    },
+                                },
+                                // Add more prose styles if needed
+                            },
+                        },
+                        dark: { // Ensure dark mode prose styles are defined if using typography plugin with dark mode
+                             css: {
+                                color: theme('colors.gray.300'),
+                                a: {
+                                    color: theme('colors.blue.400'),
+                                    '&:hover': {
+                                        color: theme('colors.blue.600'),
+                                    },
+                                },
+                                // Add more dark mode prose styles
+                             },
+                        },
+                    }),
+                }
+            },
+            // Add the typography plugin if you want richer text styling for blog content
+            // plugins: [require('@tailwindcss/typography')],
         }
     </script>
     <style type="text/tailwindcss">
@@ -21,28 +50,39 @@
             content-visibility: auto;
           }
         }
+        /* Add a subtle transition for background color changes */
+        body {
+            transition: background-color 0.3s ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center pt-10">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col items-center font-sans antialiased">
 
-    <header class="mb-8">
-        <h1 class="text-4xl font-bold">My Articles</h1>
+    <header class="w-full max-w-4xl px-4 py-6 mb-10 border-b border-gray-200 dark:border-gray-700">
+        <h1 class="text-5xl font-extrabold text-center text-gray-900 dark:text-white tracking-tight">
+            Plum Labs <span class="text-indigo-600 dark:text-indigo-400">Blog</span>
+        </h1>
+        <p class="text-center text-lg text-gray-500 dark:text-gray-400 mt-2">Insights and updates</p>
     </header>
 
-    <main class="w-full max-w-2xl px-4">
+    <main class="w-full max-w-3xl px-6 lg:px-8 flex-grow">
         <div
             hx-get="http://localhost:1612/api/articles/getall"
             hx-trigger="load"
             hx-swap="innerHTML"
-            class="bg-gray-100 dark:bg-gray-800 p-4 rounded shadow"
+            class="space-y-8" /* Add space between potential article elements loaded by HTMX */
         >
-            <p>Loading articles...</p>
-            <!-- Articles from the API will be loaded here -->
+            <div class="flex justify-center items-center h-40">
+                 <p class="text-gray-400 dark:text-gray-500 text-sm">Loading articles...</p> {/* Changed text size and color, removed animate-pulse */}
+                 <!-- Consider adding a spinner icon here -->
+            </div>
+            <!-- Articles from the API will be loaded here, potentially replacing the loading indicator -->
+            <!-- Assuming the backend returns article blocks, the space-y-8 above will separate them -->
         </div>
     </main>
 
-    <footer class="mt-auto py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-        Powered by HTMX & Tailwind
+    <footer class="w-full mt-16 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+        © 2025 Plum Labs Blog. All rights reserved. 
     </footer>
 
 </body>
