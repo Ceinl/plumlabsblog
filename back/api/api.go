@@ -2,8 +2,12 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
+
 	article_manager "plumlabs/back/articles"
 )
 
@@ -32,7 +36,7 @@ func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := r.ParseMultipartForm(10 << 20) 
+	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		http.Error(w, "<div class='error'>Failed to parse form: "+err.Error()+"</div>", http.StatusBadRequest)
 		return
@@ -52,7 +56,7 @@ func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
-	log.Printf("Article uploaded successfully")	
+	log.Printf("Article uploaded successfully")
 	w.Write([]byte("<div id='upload-result' class='success'>Article uploaded successfully</div>"))
 }
 
@@ -99,7 +103,7 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 
 	title := r.URL.Query().Get("title")
 
-	if title == ""{
+	if title == "" {
 		http.Error(w, "Missing title parameter", http.StatusBadRequest)
 		return
 	}
@@ -126,54 +130,55 @@ func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "<div class='error'>Failed to get titles: "+err.Error()+"</div>", http.StatusInternalServerError)
 		return
 	}
-	
+
 	if titles == nil {
-		titles = []string{} 
+		titles = []string{}
 	}
-	
+
 	w.Header().Set("Content-Type", "text/html")
-	
-	// TODO: return not html content but tamplate with titles as param
-	html := "<ul>"
-	for _, title := range titles {
-		html += "<li>" + title + "</li>"
+
+	// Use the updated AllArticlesWrapper
+	w.Write(AllArticlesWrapper(titles))
+}
+
+// Updated AllArticlesWrapper to use Tailwind and HTMX
+func AllArticlesWrapper(titles []string) []byte {
+	var htmlBuilder strings.Builder
+	htmlBuilder.WriteString("<div id='all-articles' class='p-4 bg-gray-800 rounded-lg shadow-md'>") // Container with Tailwind styling
+	htmlBuilder.WriteString("<h3 class='text-xl font-semibold mb-3 text-white'>Available Articles</h3>")
+	if len(titles) == 0 {
+		htmlBuilder.WriteString("<p class='text-gray-400'>No articles found.</p>")
+	} else {
+		htmlBuilder.WriteString("<ul class='space-y-2'>")
+		for _, title := range titles {
+			// Added text-center and changed text color classes
+			htmlBuilder.WriteString(fmt.Sprintf(
+				`<li
+                    class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out text-center'
+                    hx-get="/api/article/get?title=%s"
+                    hx-target="#article-display"
+                    hx-swap="innerHTML"
+                    hx-indicator="#loading-indicator">
+                    %s
+                 </li>`,
+				url.QueryEscape(title), // Ensure title is URL-encoded
+				title,
+			))
+		}
+		htmlBuilder.WriteString("</ul>")
 	}
-	html += "</ul>"
-	w.Write(AllArticlesWrapper(html))
+	// Added a loading indicator for HTMX requests
+	htmlBuilder.WriteString("<div id='loading-indicator' class='htmx-indicator text-gray-400 mt-2'>Loading...</div>")
+	htmlBuilder.WriteString("</div>") // Close container div
+	// Added a target div for displaying the selected article
+	htmlBuilder.WriteString("<div id='article-display' class='mt-4'></div>")
+
+	return []byte(htmlBuilder.String())
 }
 
-func AllArticlesWrapper(html string) []byte  {
-
-	html = "<div id='all-articles'>" + html + "</div>"
-
-	return []byte(html)
+// Updated ArticleWrapper to use Tailwind
+func ArticleWrapper(html string) []byte {
+	// Added Tailwind classes for styling the article content area
+	wrapperHtml := fmt.Sprintf("<div id='article' class='prose prose-invert max-w-none p-4 bg-gray-700 rounded-lg shadow-inner'>%s</div>", html)
+	return []byte(wrapperHtml)
 }
-
-func ArticleWrapper(html string) []byte  {
-
-	html = "<div id='article'>" + html + "</div>"
-
-	return []byte(html)
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
