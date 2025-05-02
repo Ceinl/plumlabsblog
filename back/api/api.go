@@ -44,7 +44,6 @@ func (api *API) ApiPostFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf(handler.Filename)
 	err = api.articleManager.Handle(handler)
 	if err != nil {
 		http.Error(w, "<div class='error'>Failed to process article: "+err.Error()+"</div>", http.StatusInternalServerError)
@@ -112,7 +111,7 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
 	// TODO: return not html content but tamplate with html as param
-	w.Write([]byte(html))
+	w.Write(ArticleWrapper(html))
 }
 
 func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
@@ -140,5 +139,41 @@ func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
 		html += "<li>" + title + "</li>"
 	}
 	html += "</ul>"
-	w.Write([]byte(html))
+	w.Write(AllArticlesWrapper(html))
 }
+
+func AllArticlesWrapper(html string) []byte  {
+
+	html = "<div id='all-articles'>" + html + "</div>"
+
+	return []byte(html)
+}
+
+func ArticleWrapper(html string) []byte  {
+
+	html = "<div id='article'>" + html + "</div>"
+
+	return []byte(html)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
