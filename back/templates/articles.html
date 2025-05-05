@@ -1,0 +1,23 @@
+{{define "articles.html"}}
+<div id='all-articles' class='p-4 bg-gray-800 rounded-lg shadow-md'>
+    <h3 class='text-xl font-semibold mb-3 text-white'>Available Articles</h3>
+    {{if .Titles}}
+    <ul class='space-y-2'>
+        {{range .Titles}}
+        <li
+            class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out text-center'
+            hx-get="http://localhost:1612/api/article/get?title={{. | urlquery}}"
+            hx-target="#article-display"
+            hx-swap="innerHTML"
+            hx-indicator="#loading-indicator">
+            {{.}}
+         </li>
+        {{end}}
+    </ul>
+    {{else}}
+    <p class='text-gray-400'>No articles found.</p>
+    {{end}}
+    <div id='loading-indicator' class='htmx-indicator text-gray-400 mt-2'>Loading...</div>
+</div>
+<div id='article-display' class='mt-4'></div>
+{{end}}

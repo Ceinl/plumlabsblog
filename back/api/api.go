@@ -2,18 +2,29 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"net/url"
-	"strings"
 
 	article_manager "plumlabs/back/articles"
 )
 
+type ArticleData struct {
+	HTMLContent template.HTML 
+}
+
+type ArticlesData struct {
+	Titles []string
+}
+
 type API struct {
 	db             *sql.DB
 	articleManager article_manager.Manager
+	templates      *template.Template 
+}
+
+func safeHTML(s string) template.HTML {
+	return template.HTML(s)
 }
 
 func New(db *sql.DB) API {
@@ -21,6 +32,13 @@ func New(db *sql.DB) API {
 
 	am := *article_manager.NewArticleManager(db)
 	api.articleManager = am
+
+	tmpl, err := template.New("").Funcs(template.FuncMap{"safeHTML": safeHTML}).ParseGlob("templates/*.html")
+	if err != nil {
+		log.Fatalf("Failed to parse templates: %v", err) 
+	}
+	api.templates = tmpl
+	log.Println("HTML templates loaded successfully.")
 
 	return api
 }
@@ -107,15 +125,19 @@ func (api *API) ApiGetArticle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Missing title parameter", http.StatusBadRequest)
 		return
 	}
-	html, err := api.articleManager.ReadHtmlArticle(title)
+	htmlContent, err := api.articleManager.ReadHtmlArticle(title)
 	if err != nil {
 		http.Error(w, "Article not found", http.StatusNotFound)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html")
 
-	// TODO: return not html content but tamplate with html as param
-	w.Write(ArticleWrapper(html))
+	data := ArticleData{HTMLContent: template.HTML(htmlContent)} 
+	err = api.templates.ExecuteTemplate(w, "article.html", data)
+	if err != nil {
+		log.Printf("Error executing article template: %v", err)
+		http.Error(w, "Failed to render article", http.StatusInternalServerError)
+	}
 }
 
 func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
@@ -137,48 +159,11 @@ func (api *API) ApiGetTitles(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 
-	// Use the updated AllArticlesWrapper
-	w.Write(AllArticlesWrapper(titles))
-}
-
-// Updated AllArticlesWrapper to use Tailwind and HTMX
-func AllArticlesWrapper(titles []string) []byte {
-	var htmlBuilder strings.Builder
-	htmlBuilder.WriteString("<div id='all-articles' class='p-4 bg-gray-800 rounded-lg shadow-md'>") // Container with Tailwind styling
-	htmlBuilder.WriteString("<h3 class='text-xl font-semibold mb-3 text-white'>Available Articles</h3>")
-	if len(titles) == 0 {
-		htmlBuilder.WriteString("<p class='text-gray-400'>No articles found.</p>")
-	} else {
-		htmlBuilder.WriteString("<ul class='space-y-2'>")
-		for _, title := range titles {
-			// Added text-center and changed text color classes
-			htmlBuilder.WriteString(fmt.Sprintf(
-				`<li
-                    class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out text-center'
-					hx-get="http://localhost:1612/api/article/get?title=%s"
-                    hx-target="#article-display"
-                    hx-swap="innerHTML"
-                    hx-indicator="#loading-indicator">
-                    %s
-                 </li>`,
-				url.QueryEscape(title), // Ensure title is URL-encoded
-				title,
-			))
-		}
-		htmlBuilder.WriteString("</ul>")
+	data := ArticlesData{Titles: titles}
+	err = api.templates.ExecuteTemplate(w, "articles.html", data)
+	if err != nil {
+		log.Printf("Error executing articles template: %v", err)
+		http.Error(w, "Failed to render articles list", http.StatusInternalServerError)
 	}
-	// Added a loading indicator for HTMX requests
-	htmlBuilder.WriteString("<div id='loading-indicator' class='htmx-indicator text-gray-400 mt-2'>Loading...</div>")
-	htmlBuilder.WriteString("</div>") // Close container div
-	// Added a target div for displaying the selected article
-	htmlBuilder.WriteString("<div id='article-display' class='mt-4'></div>")
-
-	return []byte(htmlBuilder.String())
 }
 
-// Updated ArticleWrapper to use Tailwind
-func ArticleWrapper(html string) []byte {
-	// Added Tailwind classes for styling the article content area
-	wrapperHtml := fmt.Sprintf("<div id='article' class='prose prose-invert max-w-none p-4 bg-gray-700 rounded-lg shadow-inner'>%s</div>", html)
-	return []byte(wrapperHtml)
-}
