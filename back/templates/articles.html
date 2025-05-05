@@ -1,11 +1,11 @@
 {{define "articles.html"}}
-<div id='all-articles' class='p-4 bg-gray-800 rounded-lg shadow-md'>
+<div id='all-articles' class='w-full h-screen overflow-y-auto p-4 bg-gray-800 rounded-lg shadow-md'> <!-- Changed w-64 to w-full -->
     <h3 class='text-xl font-semibold mb-3 text-white'>Available Articles</h3>
     {{if .Titles}}
     <ul class='space-y-2'>
         {{range .Titles}}
         <li
-            class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out text-center'
+            class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out block'
             hx-get="http://localhost:1612/api/article/get?title={{. | urlquery}}"
             hx-target="#article-display"
             hx-swap="innerHTML"
@@ -19,5 +19,5 @@
     {{end}}
     <div id='loading-indicator' class='htmx-indicator text-gray-400 mt-2'>Loading...</div>
 </div>
-<div id='article-display' class='mt-4'></div>
+<!-- Removed the extra article-display div from here -->
 {{end}}

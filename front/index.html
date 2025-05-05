@@ -61,16 +61,25 @@
         <p class="text-center text-lg text-gray-500 dark:text-gray-400 mt-2">Project</p>
     </header>
 
-    <main class="w-full max-w-3xl px-6 lg:px-8 flex-grow">
+    <!-- Use flexbox to arrange children side-by-side -->
+    <main class="w-full max-w-full px-6 lg:px-8 flex-grow flex space-x-4"> <!-- Changed max-w-6xl to max-w-full -->
+        <!-- Container for the article list (sidebar) - Takes 1/5th width -->
         <div
             hx-get="http://localhost:1612/api/articles/getall"
             hx-trigger="load"
             hx-swap="innerHTML"
-            class="space-y-8" 
+            class="w-1/5"  <!-- Changed flex-shrink-0 to w-1/5 -->
         >
+            <!-- Loading indicator for the list itself -->
             <div class="flex justify-center items-center h-40">
-                 <p class="text-gray-400 dark:text-gray-500 text-sm">Loading articles...</p> 
+                 <p class="text-gray-400 dark:text-gray-500 text-sm">Loading articles...</p>
             </div>
+        </div>
+
+        <!-- Container for the selected article content - Takes 4/5th width -->
+        <div id="article-display" class="w-4/5 bg-gray-100 dark:bg-gray-800 rounded-lg p-4 shadow overflow-y-auto"> <!-- Changed flex-grow to w-4/5, added overflow-y-auto -->
+             <!-- Content will be loaded here by HTMX clicks from the list -->
+             <p class="text-gray-500 dark:text-gray-400">Select an article from the list to view its content.</p>
         </div>
     </main>
 
