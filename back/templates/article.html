@@ -1,5 +1,5 @@
 {{define "article.html"}}
-<div id='article' class='prose prose-invert max-w-none p-4 bg-gray-700 rounded-lg shadow-inner'>
+<div id='article' class='prose prose-invert max-w-none p-6 bg-transparent rounded-lg'> <!-- Changed bg-gray-700 to bg-transparent as parent now has bg, increased padding -->
     {{.HTMLContent}}
 </div>
 {{end}}

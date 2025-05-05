@@ -1,15 +1,18 @@
 {{define "articles.html"}}
-<div id='all-articles' class='w-full h-screen overflow-y-auto p-4 bg-gray-800 rounded-lg shadow-md'> <!-- Changed w-64 to w-full -->
-    <h3 class='text-xl font-semibold mb-3 text-white'>Available Articles</h3>
+<!-- Added subtle border -->
+<div id='all-articles' class='w-full h-screen overflow-y-auto p-4 bg-gray-800 rounded-lg shadow-md border border-gray-700'>
+    <h3 class='text-xl font-semibold mb-4 text-white'>Available Articles</h3> <!-- Increased mb -->
     {{if .Titles}}
-    <ul class='space-y-2'>
+    <ul class='space-y-1'> <!-- Decreased space-y for tighter list -->
         {{range .Titles}}
         <li
-            class='text-green-400 hover:text-green-300 cursor-pointer p-2 rounded hover:bg-gray-700 transition duration-150 ease-in-out block'
+            class='text-green-400 hover:text-green-200 focus:text-green-200 focus:bg-gray-600 cursor-pointer px-3 py-2 rounded hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition duration-150 ease-in-out block'
             hx-get="http://localhost:1612/api/article/get?title={{. | urlquery}}"
             hx-target="#article-display"
             hx-swap="innerHTML"
-            hx-indicator="#loading-indicator">
+            hx-indicator="#loading-indicator"
+            tabindex="0"
+            >
             {{.}}
          </li>
         {{end}}
@@ -19,5 +22,4 @@
     {{end}}
     <div id='loading-indicator' class='htmx-indicator text-gray-400 mt-2'>Loading...</div>
 </div>
-<!-- Removed the extra article-display div from here -->
 {{end}}
