@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
+	<meta lang="en">
+	<meta author="Dmytro Slyva">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plum Labs Blog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
     <script>
-        // Basic Tailwind dark mode configuration
         tailwind.config = {
-            darkMode: 'class', // or 'media'
+            darkMode: 'class', 
             theme: {
                 extend: {
                     typography: ({ theme }) => ({
@@ -22,10 +23,9 @@
                                         color: theme('colors.blue.700'),
                                     },
                                 },
-                                // Add more prose styles if needed
                             },
                         },
-                        dark: { // Ensure dark mode prose styles are defined if using typography plugin with dark mode
+                        dark: { 
                              css: {
                                 color: theme('colors.gray.300'),
                                 a: {
@@ -34,14 +34,11 @@
                                         color: theme('colors.blue.600'),
                                     },
                                 },
-                                // Add more dark mode prose styles
                              },
                         },
                     }),
                 }
             },
-            // Add the typography plugin if you want richer text styling for blog content
-            // plugins: [require('@tailwindcss/typography')],
         }
     </script>
     <style type="text/tailwindcss">
@@ -50,7 +47,6 @@
             content-visibility: auto;
           }
         }
-        /* Add a subtle transition for background color changes */
         body {
             transition: background-color 0.3s ease-in-out;
         }
@@ -60,9 +56,9 @@
 
     <header class="w-full max-w-4xl px-4 py-6 mb-10 border-b border-gray-200 dark:border-gray-700">
         <h1 class="text-5xl font-extrabold text-center text-gray-900 dark:text-white tracking-tight">
-            Plum Labs <span class="text-indigo-600 dark:text-indigo-400">Blog</span>
+            <span class="text-indigo-600 dark:text-indigo-400">Blog Engine </span>
         </h1>
-        <p class="text-center text-lg text-gray-500 dark:text-gray-400 mt-2">Insights and updates</p>
+        <p class="text-center text-lg text-gray-500 dark:text-gray-400 mt-2">Project</p>
     </header>
 
     <main class="w-full max-w-3xl px-6 lg:px-8 flex-grow">
@@ -70,19 +66,16 @@
             hx-get="http://localhost:1612/api/articles/getall"
             hx-trigger="load"
             hx-swap="innerHTML"
-            class="space-y-8" /* Add space between potential article elements loaded by HTMX */
+            class="space-y-8" 
         >
             <div class="flex justify-center items-center h-40">
-                 <p class="text-gray-400 dark:text-gray-500 text-sm">Loading articles...</p> {/* Changed text size and color, removed animate-pulse */}
-                 <!-- Consider adding a spinner icon here -->
+                 <p class="text-gray-400 dark:text-gray-500 text-sm">Loading articles...</p> 
             </div>
-            <!-- Articles from the API will be loaded here, potentially replacing the loading indicator -->
-            <!-- Assuming the backend returns article blocks, the space-y-8 above will separate them -->
         </div>
     </main>
 
     <footer class="w-full mt-16 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-        © 2025 Plum Labs Blog. All rights reserved. 
+        © 2025 Slyva Dmytro All Rights Reserved.
     </footer>
 
 </body>
