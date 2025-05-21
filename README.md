@@ -19,17 +19,23 @@
 
 # Usage
 
-    Clone project
-    ```git clone https://github.com/dmytroslyva/plumlabsblog.git
-    cd plumlabsblog```
+Clone project
+```
+    git clone https://github.com/dmytroslyva/plumlabsblog.git
+    cd plumlabsblog
+```
 
-    Terminal session 1
-    ```cd back
-    go run main.go```
+Terminal session 1
+```
+    cd back
+    go run main.go
+```
 
-    Terminal session 2
-    ```cd front
-    go run main.go```
+Terminal session 2
+```
+    cd front
+    go run main.go
+```
 
 
 
