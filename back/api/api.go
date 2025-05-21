@@ -30,6 +30,7 @@ func safeHTML(s string) template.HTML {
 func New(db *sql.DB) API {
 	api := API{db: db}
 
+
 	am := *article_manager.NewArticleManager(db)
 	api.articleManager = am
 
